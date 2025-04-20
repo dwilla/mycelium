@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - schema: "sql/schema"
+    queries: "sql/queries"
+    engine: "postgresql"
+    database:
+      uri: "postgres://drewwillard@localhost:5432/mycelium?sslmode=disable"
+    gen:
+      go:
+        out: "internal/database"
