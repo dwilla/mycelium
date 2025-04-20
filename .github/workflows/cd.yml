@@ -24,6 +24,10 @@ jobs:
         - name: Build Go binary
           run: ./scripts/buildprod.sh
         
+        - name: Build and tag Docker image
+          run: |
+            docker build -t us-south1-docker.pkg.dev/mycelium-coms/mycelium-repo/mycelium:latest .
+        
         - id: 'auth'
           uses: 'google-github-actions/auth@v2'
           with:
@@ -32,10 +36,9 @@ jobs:
         - name: 'Set up Cloud SDK'
           uses: 'google-github-actions/setup-gcloud@v2'
 
-        - name: 'Build and Push with Cloud Build'
+        - name: 'Push with Cloud Build'
           run: |
-            gcloud builds submit \
-              --tag us-south1-docker.pkg.dev/mycelium-coms/mycelium-repo/mycelium:latest
+            gcloud builds submit .
 
       #  - name: 'Install goose'
       #    run: go install github.com/pressly/goose/v3/cmd/goose@latest
