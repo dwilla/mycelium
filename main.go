@@ -24,18 +24,12 @@ func main() {
 	}
 
 	dbURL := os.Getenv("DB_URL")
-	if dbURL == "" {
-		log.Println("DATABASE_URL environment variable is not set")
-		log.Println("Running without CRUD endpoints")
-	} else {
-		db, err := sql.Open("postgres", dbURL)
-		if err != nil {
-			log.Fatal(err)
-		}
-		dbQueries := database.New(db)
-		cfg.DB = dbQueries
-		log.Println("Connected to database!")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal(err)
 	}
+	dbQueries := database.New(db)
+	cfg.DB = dbQueries
 
 	mux := http.NewServeMux()
 
