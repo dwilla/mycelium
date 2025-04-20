@@ -1,17 +1,22 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/dwilla/mycelium/internal/database"
 	"github.com/joho/godotenv"
 )
 
+type config struct {
+	DB *database.Queries
+}
+
 func main() {
+	cfg := config{}
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
@@ -19,20 +24,17 @@ func main() {
 
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
-		log.Fatal("DB_URL environment variable is not set")
+		log.Println("DATABASE_URL environment variable is not set")
+		log.Println("Running without CRUD endpoints")
+	} else {
+		db, err := sql.Open("libsql", dbURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		dbQueries := database.New(db)
+		cfg.DB = dbQueries
+		log.Println("Connected to database!")
 	}
-
-	conn, err := pgx.Connect(context.Background(), dbURL)
-	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
-	}
-	defer log.Fatal(conn.Close(context.Background()))
-
-	err = conn.Ping(context.Background())
-	if err != nil {
-		log.Fatalf("Unable to ping database: %v\n", err)
-	}
-	log.Println("Successfully connected to database")
 
 	mux := http.NewServeMux()
 
