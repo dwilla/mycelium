@@ -27,7 +27,7 @@ func main() {
 		log.Println("DATABASE_URL environment variable is not set")
 		log.Println("Running without CRUD endpoints")
 	} else {
-		db, err := sql.Open("libsql", dbURL)
+		db, err := sql.Open("postgres", dbURL)
 		if err != nil {
 			log.Fatal(err)
 		}
