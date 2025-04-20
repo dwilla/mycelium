@@ -8,9 +8,6 @@ jobs:
   deployment:
       name: Deploy
       runs-on: ubuntu-latest
-
-      #env:
-      #  DATABASE_URL: ${{ secrets.DATABASE_URL }}
     
       steps:
         - name: Check out code
@@ -35,14 +32,27 @@ jobs:
         - name: 'Build and Push with Cloud Build'
           run: gcloud builds submit -t us-south1-docker.pkg.dev/bcalternative-mycelium/mycelium-repo/mycelium:latest .
 
-      #  - name: 'Install goose'
-      #    run: go install github.com/pressly/goose/v3/cmd/goose@latest
-#
-      #  - name: 'Run Migrations'
-      #    run: ./scripts/migrateup.sh
-#
+        - name: Deploy to Cloud Run
+          run: |
+            gcloud run deploy mycelium \
+              --image us-south1-docker.pkg.dev/bcalternative-mycelium/mycelium-repo/mycelium:latest \
+              --region us-south1 \
+              --allow-unauthenticated \
+              --project bcalternative-mycelium \
+              --max-instances=4 \
+              --add-cloudsql-instances ${{ secrets.CLOUD_SQL_INSTANCE }} \
+              --set-env-vars "DB_URL=postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
+
+        - name: 'Install goose'
+          run: go install github.com/pressly/goose/v3/cmd/goose@latest
+
+        - name: 'Run Migrations'
+          env:
+            GOOSE_DBSTRING: "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
+          run: |
+            # Wait a few seconds for the Cloud SQL connection to be ready
+            sleep 10
+            ./scripts/migrateup.sh
+
         - name: 'Check source code'
           run: git diff
-        
-        - name: Deploy to Cloud Run
-          run: gcloud run deploy mycelium --image us-south1-docker.pkg.dev/bcalternative-mycelium/mycelium-repo/mycelium:latest --region us-south1 --allow-unauthenticated --project bcalternative-mycelium --max-instances=4
