@@ -41,14 +41,14 @@ jobs:
               --project bcalternative-mycelium \
               --max-instances=4 \
               --add-cloudsql-instances ${{ secrets.CLOUD_SQL_INSTANCE }} \
-              --set-env-vars "DB_URL=postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
+              --set-env-vars "DB_URL=postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
 
         - name: 'Install goose'
           run: go install github.com/pressly/goose/v3/cmd/goose@latest
 
         - name: 'Run Migrations'
           env:
-            GOOSE_DBSTRING: "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
+            GOOSE_DBSTRING: "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost/${{ secrets.DB_NAME }}?host=/cloudsql/${{ secrets.CLOUD_SQL_INSTANCE }}"
           run: |
             # Wait a few seconds for the Cloud SQL connection to be ready
             sleep 10
