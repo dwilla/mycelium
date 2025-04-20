@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -15,10 +17,22 @@ func main() {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT environment variable is not set")
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL environment variable is not set")
 	}
+
+	conn, err := pgx.Connect(context.Background(), dbURL)
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+	}
+	defer log.Fatal(conn.Close(context.Background()))
+
+	err = conn.Ping(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to ping database: %v\n", err)
+	}
+	log.Println("Successfully connected to database")
 
 	mux := http.NewServeMux()
 
@@ -30,5 +44,4 @@ func main() {
 
 	log.Printf("Running at: http://localhost%v\n", server.Addr)
 	log.Fatal(server.ListenAndServe())
-
 }
