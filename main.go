@@ -27,6 +27,6 @@ func main() {
 	}
 
 	log.Printf("Running at: http://localhost%v\n", server.Addr)
-	server.ListenAndServe()
+	log.Fatal(server.ListenAndServe())
 
 }
