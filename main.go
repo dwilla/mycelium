@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -22,8 +23,9 @@ func main() {
 	mux := http.NewServeMux()
 
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: mux,
+		Addr:              ":8080",
+		Handler:           mux,
+		ReadHeaderTimeout: (10 * time.Second),
 	}
 
 	log.Printf("Running at: http://localhost%v\n", server.Addr)
