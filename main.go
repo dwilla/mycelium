@@ -9,6 +9,7 @@ import (
 
 	"github.com/dwilla/mycelium/internal/database"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 type config struct {
