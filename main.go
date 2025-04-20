@@ -26,7 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
-	defer conn.Close(context.Background())
+	defer log.Fatal(conn.Close(context.Background()))
 
 	err = conn.Ping(context.Background())
 	if err != nil {
