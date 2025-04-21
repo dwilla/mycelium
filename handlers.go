@@ -16,10 +16,14 @@ func (cfg config) handleMain(w http.ResponseWriter, r *http.Request) {
 	currentUser := database.User{}
 	if currentUser.Username != "" {
 		component := templates.Main(currentUser)
-		component.Render(r.Context(), w)
+		if err := component.Render(r.Context(), w); err != nil {
+			respondWithError(w, 500, "error rendering component", err)
+		}
 	} else {
 		component := templates.Login()
-		component.Render(r.Context(), w)
+		if err := component.Render(r.Context(), w); err != nil {
+			respondWithError(w, 500, "error rendering component", err)
+		}
 	}
 }
 
@@ -40,7 +44,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(jsonRes)
+	log.Fatal(w.Write(jsonRes))
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload any) {
@@ -52,5 +56,5 @@ func respondWithJSON(w http.ResponseWriter, code int, payload any) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(jsonRes)
+	log.Fatal(w.Write(jsonRes))
 }
