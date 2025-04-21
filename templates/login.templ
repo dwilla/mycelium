@@ -8,11 +8,16 @@ templ Login() {
             <link rel="stylesheet" href="/static/styles.css">
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
         </head>
         <body>
             <div>
                 <h1>Welcome to Mycelium</h1>
                 <p>Please login:</p>
+                <input data-bind-input />
+                <div data-text="$input">
+                  I will be replaced with the contents of the input signal
+                </div>
             </div>
             <footer>
                 <!-- Add your footer here -->
