@@ -1,0 +1,30 @@
+package templates
+
+import (
+    "github.com/dwilla/mycelium/internal/database"
+)
+
+templ Main(user database.User) {
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>main</title>
+            <link rel="stylesheet" href="/static/styles.css">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body>
+            <header>
+                <nav>
+                    <p>Logged in with: { user.Email }</p>
+                </nav>
+            </header>
+            <div>
+                <h1>Welcome to Mycelium</h1>
+            </div>
+            <footer>
+                <!-- Add your footer here -->
+            </footer>
+        </body>
+    </html>
+}

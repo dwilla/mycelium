@@ -32,6 +32,7 @@ func main() {
 	cfg.DB = dbQueries
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", cfg.handleMain)
 
 	server := http.Server{
 		Addr:              ":8080",
