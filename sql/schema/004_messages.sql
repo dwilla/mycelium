@@ -1,0 +1,12 @@
+-- +goose Up
+CREATE TABLE messages (
+    id UUID PRIMARY KEY,
+    author UUID NOT NULL REFERENCES users,
+    channel UUID REFERENCES channels,
+    body VARCHAR(300) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- +goose Down
+DROP TABLE messages;

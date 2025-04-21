@@ -10,6 +10,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type Channel struct {
+	ID        uuid.UUID
+	Name      string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
+type Message struct {
+	ID        uuid.UUID
+	Author    uuid.UUID
+	Channel   uuid.NullUUID
+	Body      string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
+type Sub struct {
+	UserID        uuid.UUID
+	ChannelID     uuid.UUID
+	Notifications sql.NullBool
+}
+
 type User struct {
 	ID           uuid.UUID
 	Username     string
