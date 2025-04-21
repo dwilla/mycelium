@@ -46,15 +46,3 @@ func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
 	w.WriteHeader(code)
 	log.Fatal(w.Write(jsonRes))
 }
-
-func respondWithJSON(w http.ResponseWriter, code int, payload any) {
-	jsonRes, err := json.Marshal(payload)
-	if err != nil {
-		log.Printf("error marshalling payload: %v", err)
-		w.WriteHeader(500)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	log.Fatal(w.Write(jsonRes))
-}
