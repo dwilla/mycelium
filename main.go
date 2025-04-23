@@ -7,17 +7,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/dwilla/mycelium/handlers"
 	"github.com/dwilla/mycelium/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
-type config struct {
-	DB *database.Queries
-}
-
 func main() {
-	cfg := config{}
+	cfg := handlers.Config{}
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
@@ -32,7 +29,11 @@ func main() {
 	cfg.DB = dbQueries
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", cfg.handleMain)
+	mux.HandleFunc("/", cfg.HandleMain)
+	mux.HandleFunc("GET /app", cfg.HandleApp)
+	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
+	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
+	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
 
 	server := http.Server{
 		Addr:              ":8080",
