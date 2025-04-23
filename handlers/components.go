@@ -22,6 +22,8 @@ func (cfg Config) HandleApp(w http.ResponseWriter, r *http.Request) {
 		component := templates.Login()
 
 		sse := datastar.NewSSE(w, r)
-		sse.MergeFragmentTempl(component)
+		if err := sse.MergeFragmentTempl(component); err != nil {
+			http.Error(w, err.Error(), 500)
+		}
 	}
 }
