@@ -1,27 +1,34 @@
 package templates
 
 templ Login() {
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>main</title>
-            <link rel="stylesheet" href="/static/styles.css">
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
-        </head>
-        <body>
+    <div id="app">
+        <h1>Welcome to Mycelium</h1>
+        <div id="errors"></div>
+        <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
             <div>
-                <h1>Welcome to Mycelium</h1>
-                <p>Please login:</p>
-                <input data-bind-input />
-                <div data-text="$input">
-                  I will be replaced with the contents of the input signal
-                </div>
+                    <p data-show="$valid == false">Enter Valid Email</p>
+                    <p data-show="$valid == true && $exists == false">Create an account:</p>
+                    <input type="text" data-bind="email"/>
             </div>
-            <footer>
-                <!-- Add your footer here -->
-            </footer>
-        </body>
-    </html>
+            <br>
+            <div data-on-signal-change-email="@get('/auth/email')" data-indicator-fetching>
+                <div data-show="$valid == true && $exists == false"  data-on-signal-change-password="@get('/auth/password')" data-on-signal-change-username="@get('/auth/username')">
+                    <label>Pick a username:</label>
+                    <input type="text" data-bind="username"/>
+                    <p data-show="$user-valid == false">Username invalid or not available.</p>
+                    <p data-show="$user-valid == true">Username available!</p>     
+                    <label>Password:</label>                                    
+                    <input type="text" data-bind="password"/>
+                    <p data-show="$pass-valid == false">Invalid password. Must be 12 characters long.</p>
+                    <p data-show="$pass-valid == true && $user-valid == false">Perfect!</p>
+                    <br>
+                    <button
+                        data-show="$user-valid == true && $pass-valid == true"
+                        data-on-click="@put('/endpoint')">
+                        Sign Up
+                    </button>
+               </div>
+            </div>
+        </div>
+    </div>
 }

@@ -7,9 +7,64 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
+
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (id, username, email, password_hash)
+VALUES (
+    gen_random_uuid(),
+    $1,
+    $2,
+    $3
+) RETURNING id, username, email, password_hash, created_at, updated_at
+`
+
+type CreateUserParams struct {
+	Username     string
+	Email        string
+	PasswordHash sql.NullString
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.Email, arg.PasswordHash)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id FROM users
+WHERE email = $1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id FROM users
+WHERE username = $1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
 
 const getUserFromId = `-- name: GetUserFromId :one
 SELECT id, username, email, password_hash, created_at, updated_at FROM users
