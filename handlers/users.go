@@ -25,7 +25,7 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
-	newUser, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+	_, err = cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Email:        signals.Email,
 		Username:     signals.Username,
 		PasswordHash: sql.NullString{String: hashedPass},
@@ -34,7 +34,6 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 	}
 
-	cfg.CurrentUser = *newUser
 }
 
 func (cfg Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
