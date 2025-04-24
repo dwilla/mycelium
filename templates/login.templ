@@ -4,12 +4,12 @@ templ Login() {
     <div id="app">
         <h1>Welcome to Mycelium</h1>
         <div id="errors"></div>
-        <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
-            <div>
+            <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
+                <div>
                     <p data-show="$valid == false">Enter Valid Email</p>
                     <p data-show="$valid == true && $exists == false">Create an account:</p>
                     <input type="text" data-bind="email"/>
-            </div>
+                </div>
             <br>
             <div data-on-signal-change-email="@get('/auth/email')" data-indicator-fetching>
                 <div data-show="$valid == true && $exists == false"  data-on-signal-change-password="@get('/auth/password')" data-on-signal-change-username="@get('/auth/username')">
