@@ -29,7 +29,7 @@ func Main() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><title>Mycelium</title><link rel=\"stylesheet\" href=\"/static/styles.css\"><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js\"></script></head><body><header><nav><button>Account</button></nav></header><div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\"></div><footer><!-- Add your footer here --></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><title>Mycelium</title><link rel=\"stylesheet\" href=\"/static/styles.css\"><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"csrf-token\" content=\"{ csrfToken }\"><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js\"></script></head><body><div data-signals=\"{auth: false}\"><header><nav><button>Account</button> <a data-show=\"$auth == true\" href=\"/auth/logout\">Sign Out</a></nav></header><div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\"></div></div><footer><!-- Add your footer here --></footer></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

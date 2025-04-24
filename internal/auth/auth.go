@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,6 +20,12 @@ func HashPassword(password string) (string, error) {
 
 func CheckPasswordHash(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func MakeRefreshToken() (string, error) {
+	random := make([]byte, 32)
+	_, _ = rand.Read(random)
+	return hex.EncodeToString(random), nil
 }
 
 func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error) {
