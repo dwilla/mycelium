@@ -6,6 +6,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,6 +23,15 @@ type Message struct {
 	Author    uuid.UUID
 	Channel   uuid.NullUUID
 	Body      string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
+type RefreshToken struct {
+	Token     string
+	UserID    uuid.UUID
+	ExpiresAt time.Time
+	RevokedAt sql.NullTime
 	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime
 }

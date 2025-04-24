@@ -34,19 +34,20 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", cfg.HandleMain)
-	mux.HandleFunc("GET /app", cfg.HandleApp)
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
 	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
 	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
 	mux.HandleFunc("POST /auth/newuser", cfg.HandleNewUser)
-	mux.HandleFunc("GET /auth/checkvalid", cfg.HandleValid)
+	mux.HandleFunc("POST /auth/login", cfg.HandleLogin)
+	mux.HandleFunc("/auth/logout", cfg.HandleSignOut)
+	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
-	server := http.Server{
-		Addr:              ":8080",
+	server := &http.Server{
+		Addr:              ":8443",
 		Handler:           mux,
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
-	log.Printf("Running at: http://localhost%v\n", server.Addr)
-	log.Fatal(server.ListenAndServe())
+	log.Printf("Server running at: https://localhost%v\n", server.Addr)
+	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
 }

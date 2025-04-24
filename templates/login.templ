@@ -4,30 +4,31 @@ templ Login() {
     <div id="app">
         <h1>Welcome to Mycelium</h1>
         <div id="errors"></div>
-            <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
-                <div>
-                    <p data-show="$valid == false">Enter Valid Email</p>
-                    <p data-show="$valid == true && $exists == false">Create an account:</p>
-                    <input type="text" data-bind="email"/>
-                </div>
+        <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
+            <div>
+                <div id="errors"></div>
+                <p data-show="$valid == false">Enter Valid Email</p>
+                <p data-show="$valid == true && $exists == false">Create an account:</p>
+                <p data-show="$valid == true && $exists == true">Welcome Back!</p>
+                <input type="text" data-bind="email">
+            </div>
             <br>
             <div data-on-signal-change-email="@get('/auth/email')" data-indicator-fetching>
-                <div data-show="$valid == true && $exists == false"  data-on-signal-change-password="@get('/auth/password')" data-on-signal-change-username="@get('/auth/username')">
-                    <label>Pick a username:</label>
-                    <input type="text" data-bind="username"/>
+                <div data-show="$valid == true && $exists == false" data-on-signal-change-password="@get('/auth/password')" data-on-signal-change-username="@get('/auth/username')">
+                    <label>Pick a username:</label> <input type="text" data-bind="username">
                     <p data-show="$user-valid == false">Username invalid or not available.</p>
-                    <p data-show="$user-valid == true">Username available!</p>     
-                    <label>Password:</label>                                    
-                    <input type="text" data-bind="password"/>
+                    <p data-show="$user-valid == true">Username available!</p>
+                    <label>Password:</label> <input type="password" data-bind="password">
                     <p data-show="$pass-valid == false">Invalid password. Must be 12 characters long.</p>
                     <p data-show="$pass-valid == true && $user-valid == false">Perfect!</p>
                     <br>
-                    <button
-                        data-show="$user-valid == true && $pass-valid == true"
-                        data-on-click="@post('/auth/newuser')">
-                        Sign Up
-                    </button>
-               </div>
+                    <button data-show="$user-valid == true && $pass-valid == true" data-on-click="@post('/auth/newuser')">Sign Up</button>
+                </div>
+                <div data-show="$valid == true && $exists == true" data-on-signal-change-password="@get('/auth/password')">
+                    <label>Password:</label> <input type="password" data-bind="password">
+                    <br>
+                    <button data-show="$user-valid == true && $pass-valid == true" data-on-click="@post('/auth/login')">Sign In</button>
+                </div>
             </div>
         </div>
     </div>

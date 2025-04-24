@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -14,19 +12,90 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
-func (cfg Config) HandleValid(w http.ResponseWriter, r *http.Request) {
-	token, err := auth.GetBearerToken(r)
-	if err != nil {
+func (cfg Config) HandleSignOut(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+		Expires:  time.Now().Add(-1 * time.Hour),
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh-token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+		Expires:  time.Now().Add(-1 * time.Hour),
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	signals := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
+	if err := datastar.ReadSignals(r, &signals); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
-	log.Println(token)
-	_, err = auth.ValidateJWT(token, cfg.JwtSecret)
+	user, err := cfg.DB.GetUserByEmail(r.Context(), signals.Email)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		respondWithErrors(w, r, "Email not found in database", err)
+		return
+	}
+	if err := auth.CheckPasswordHash(user.PasswordHash.String, signals.Password); err != nil {
+		respondWithErrors(w, r, "Incorrect Password", err)
+		return
 	}
 
-	sse := datastar.NewSSE(w, r)
-	sse.MergeFragments(`<div id="resp">Yes!</div>`)
+	newToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	refreshToken, err := cfg.DB.MakeToken(r.Context(), database.MakeTokenParams{
+		Token:     newToken,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(1440 * time.Hour),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	token, err := auth.MakeJWT(user.ID, cfg.JwtSecret, time.Hour)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(time.Hour),
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh-token",
+		Value:    refreshToken.Token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(1440 * time.Hour),
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
@@ -52,14 +121,47 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
+	newToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+	refreshToken, err := cfg.DB.MakeToken(r.Context(), database.MakeTokenParams{
+		Token:     newToken,
+		UserID:    newUser.ID,
+		ExpiresAt: time.Now().Add(1440 * time.Hour),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 
 	token, err := auth.MakeJWT(newUser.ID, cfg.JwtSecret, time.Hour)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
-	json := fmt.Sprintf(`{"token": "%s"}`, token)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(time.Hour),
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh-token",
+		Value:    refreshToken.Token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(1440 * time.Hour),
+	})
 	sse := datastar.NewSSE(w, r)
-	sse.MergeSignals([]byte(json))
+	if err := sse.MergeSignals([]byte(`{auth: true}`)); err != nil {
+		http.Error(w, "can't update signals", 500)
+	}
 
 	component := templates.Home()
 	if err := sse.MergeFragmentTempl(component); err != nil {

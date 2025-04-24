@@ -15,7 +15,7 @@ SELECT * FROM users
 WHERE id = $1;
 
 -- name: GetUserByEmail :one
-SELECT id FROM users
+SELECT * FROM users
 WHERE email = $1;
 
 -- name: GetUserByUsername :one
