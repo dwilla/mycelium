@@ -43,11 +43,11 @@ func main() {
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
 	server := &http.Server{
-		Addr:              ":" + os.Getenv("PORT"),
+		Addr:              ":8443",
 		Handler:           mux,
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
-	log.Printf("Server running at: http://localhost:%v\n", os.Getenv("PORT"))
-	log.Fatal(server.ListenAndServe())
+	log.Printf("Server running at: https://localhost%v\n", server.Addr)
+	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
 }
