@@ -48,6 +48,6 @@ func main() {
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
-	log.Printf("Server running at: https://localhost%v\n", server.Addr)
-	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
+	log.Printf("Server running at: http://localhost%v\n", server.Addr)
+	log.Fatal(server.ListenAndServe())
 }
