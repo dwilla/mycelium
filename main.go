@@ -43,7 +43,7 @@ func main() {
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
 	server := &http.Server{
-		Addr:              ":8443",
+		Addr:              ":" + os.Getenv("PORT"),
 		Handler:           mux,
 		ReadHeaderTimeout: (10 * time.Second),
 	}
