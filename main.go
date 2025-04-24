@@ -20,6 +20,10 @@ func main() {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
 	}
 
+	cfg.JwtSecret = os.Getenv("TOKEN_SECRET")
+	if cfg.JwtSecret == "" {
+		log.Fatal("no token secret")
+	}
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
@@ -34,6 +38,8 @@ func main() {
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
 	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
 	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
+	mux.HandleFunc("POST /auth/newuser", cfg.HandleNewUser)
+	mux.HandleFunc("GET /auth/checkvalid", cfg.HandleValid)
 
 	server := http.Server{
 		Addr:              ":8080",

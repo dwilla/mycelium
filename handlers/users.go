@@ -2,13 +2,32 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dwilla/mycelium/internal/auth"
 	"github.com/dwilla/mycelium/internal/database"
+	"github.com/dwilla/mycelium/templates"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
+
+func (cfg Config) HandleValid(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+	log.Println(token)
+	_, err = auth.ValidateJWT(token, cfg.JwtSecret)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	sse := datastar.NewSSE(w, r)
+	sse.MergeFragments(`<div id="resp">Yes!</div>`)
+}
 
 func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	signals := struct {
@@ -25,7 +44,7 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
-	_, err = cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+	newUser, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Email:        signals.Email,
 		Username:     signals.Username,
 		PasswordHash: sql.NullString{String: hashedPass},
@@ -34,6 +53,18 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 	}
 
+	token, err := auth.MakeJWT(newUser.ID, cfg.JwtSecret, time.Hour)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+	json := fmt.Sprintf(`{"token": "%s"}`, token)
+	sse := datastar.NewSSE(w, r)
+	sse.MergeSignals([]byte(json))
+
+	component := templates.Home()
+	if err := sse.MergeFragmentTempl(component); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
 
 func (cfg Config) CheckEmail(w http.ResponseWriter, r *http.Request) {

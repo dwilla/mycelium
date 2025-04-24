@@ -24,7 +24,7 @@ templ Login() {
                     <br>
                     <button
                         data-show="$user-valid == true && $pass-valid == true"
-                        data-on-click="@put('/endpoint')">
+                        data-on-click="@post('/auth/newuser')">
                         Sign Up
                     </button>
                </div>

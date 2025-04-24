@@ -1,10 +1,13 @@
 package auth
 
 import (
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	datastar "github.com/starfederation/datastar/sdk/go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,6 +21,19 @@ func HashPassword(password string) (string, error) {
 
 func CheckPasswordHash(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func GetBearerToken(r *http.Request) (string, error) {
+	signal := struct {
+		Bearer string `json:"token"`
+	}{}
+	if err := datastar.ReadSignals(r, &signal); err != nil {
+		return "", fmt.Errorf("no bearer token present in signals")
+	}
+	if signal.Bearer == "" {
+		return "", fmt.Errorf("bearer token is blank")
+	}
+	return signal.Bearer, nil
 }
 
 func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error) {
