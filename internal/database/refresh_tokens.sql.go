@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-//nolint:g101
 const makeToken = `-- name: MakeToken :one
 INSERT INTO refresh_tokens (token, user_id, expires_at)
 VALUES (

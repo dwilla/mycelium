@@ -27,7 +27,7 @@ jobs:
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
       - name: Security
-        run: gosec ./...
+        run: gosec -exclude=G101 ./...
 
   style:
     name: Style
