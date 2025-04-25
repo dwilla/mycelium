@@ -26,3 +26,6 @@ sqlc.yaml
 
 # Dev scripts
 r.sh
+
+# Test SSL certs
+/certs

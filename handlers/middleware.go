@@ -43,10 +43,12 @@ func (cfg Config) Auth(next http.Handler) http.Handler {
 			http.Error(w, "user not found", http.StatusUnauthorized)
 			return
 		}
+
 		sse := datastar.NewSSE(w, r)
-		if err := sse.MergeSignals([]byte(`{auth: true}`)); err != nil {
-			http.Error(w, "can't update signals", 500)
+		if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
+			http.Error(w, "issue merging auth signal", 500)
 		}
+
 		ctx := context.WithValue(r.Context(), userContextKey, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

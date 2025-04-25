@@ -95,6 +95,11 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(1440 * time.Hour),
 	})
 
+	sse := datastar.NewSSE(w, r)
+	if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
+		http.Error(w, "issue merging auth signal", 500)
+	}
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

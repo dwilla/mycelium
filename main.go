@@ -48,6 +48,14 @@ func main() {
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
-	log.Printf("Server running at: http://localhost%v\n", server.Addr)
-	log.Fatal(server.ListenAndServe())
+	go http.ListenAndServe(":80", http.HandlerFunc(redirect))
+
+	log.Printf("Server running at: https://localhost%v\n", server.Addr)
+	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
+}
+
+func redirect(w http.ResponseWriter, req *http.Request) { // Redirects to https
+	http.Redirect(w, req,
+		"https://"+req.Host+req.URL.String(),
+		http.StatusMovedPermanently)
 }
