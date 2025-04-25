@@ -48,9 +48,15 @@ func main() {
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
+	redirectServer := &http.Server{
+		Addr:              ":80",
+		Handler:           http.HandlerFunc(redirect),
+		ReadHeaderTimeout: (10 * time.Second),
+	}
+
 	errChan := make(chan error)
 	go func() {
-		err := http.ListenAndServe(":80", http.HandlerFunc(redirect))
+		err := redirectServer.ListenAndServe()
 		if err != nil {
 			errChan <- err
 		}
