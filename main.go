@@ -42,38 +42,23 @@ func main() {
 	mux.HandleFunc("/auth/logout", cfg.HandleSignOut)
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
+	// Create a single server with proper TLS configuration
 	server := &http.Server{
 		Addr:              ":" + os.Getenv("PORT"),
 		Handler:           mux,
-		ReadHeaderTimeout: (10 * time.Second),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
-	redirectServer := &http.Server{
-		Addr:              ":80",
-		Handler:           http.HandlerFunc(redirect),
-		ReadHeaderTimeout: (10 * time.Second),
+	// Check if we're in production (Render sets this)
+	isProduction := os.Getenv("RENDER") == "true"
+
+	if isProduction {
+		// In production, Render handles HTTPS termination
+		log.Printf("Server running in production mode at: http://localhost:%v\n", os.Getenv("PORT"))
+		log.Fatal(server.ListenAndServe())
+	} else {
+		// In development, use self-signed certificates
+		log.Printf("Server running in development mode at: https://localhost:%v\n", os.Getenv("PORT"))
+		log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
 	}
-
-	errChan := make(chan error)
-	go func() {
-		err := redirectServer.ListenAndServe()
-		if err != nil {
-			errChan <- err
-		}
-	}()
-
-	go func() {
-		if err := <-errChan; err != nil {
-			log.Printf("Error in redirect server: %v", err)
-		}
-	}()
-
-	log.Printf("Server running at: https://localhost%v\n", server.Addr)
-	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
-}
-
-func redirect(w http.ResponseWriter, req *http.Request) { // Redirects to https
-	http.Redirect(w, req,
-		"https://"+req.Host+req.URL.String(),
-		http.StatusMovedPermanently)
 }

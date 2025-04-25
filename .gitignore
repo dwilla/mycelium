@@ -29,3 +29,5 @@ r.sh
 
 # Test SSL certs
 /certs
+
+/.github/workflows/cd.yml
