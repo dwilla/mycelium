@@ -48,7 +48,19 @@ func main() {
 		ReadHeaderTimeout: (10 * time.Second),
 	}
 
-	go http.ListenAndServe(":80", http.HandlerFunc(redirect))
+	errChan := make(chan error)
+	go func() {
+		err := http.ListenAndServe(":80", http.HandlerFunc(redirect))
+		if err != nil {
+			errChan <- err
+		}
+	}()
+
+	go func() {
+		if err := <-errChan; err != nil {
+			log.Printf("Error in redirect server: %v", err)
+		}
+	}()
 
 	log.Printf("Server running at: https://localhost%v\n", server.Addr)
 	log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
