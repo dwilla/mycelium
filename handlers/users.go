@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -77,11 +76,6 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log the cookie settings
-	log.Printf("Setting cookies for domain: %s", r.Host)
-	log.Printf("Token length: %d", len(token))
-	log.Printf("Refresh token length: %d", len(refreshToken.Token))
-
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    token,
@@ -102,11 +96,17 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	})
 
 	sse := datastar.NewSSE(w, r)
+
 	if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
-		http.Error(w, "issue merging auth signal", 500)
+		http.Error(w, "can't update signals", http.StatusInternalServerError)
+		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	component := templates.Home()
+	if err := sse.MergeFragmentTempl(component); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +130,7 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	newUser, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Email:        signals.Email,
 		Username:     signals.Username,
-		PasswordHash: sql.NullString{String: hashedPass},
+		PasswordHash: sql.NullString{String: hashedPass, Valid: true},
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -215,6 +215,9 @@ func (cfg Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err := cfg.DB.GetUserByEmail(r.Context(), signal.Email); err != nil {
+		if err := sse.MergeSignals([]byte(`{exists: false}`)); err != nil {
+			http.Error(w, err.Error(), 500)
+		}
 		return
 	}
 

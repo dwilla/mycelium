@@ -29,3 +29,17 @@ func TestTokens(t *testing.T) {
 		t.Errorf("uuid's don't match, %v is not %v", validUser, testUuid)
 	}
 }
+
+func TestHashing(t *testing.T) {
+	const testPass = "fjvnaoiAJRGNAO"
+
+	hashedPass, err := HashPassword(testPass)
+	if err != nil {
+		t.Error("error with HashPass: ", err)
+	}
+
+	err = CheckPasswordHash(hashedPass, testPass)
+	if err != nil {
+		t.Error("error on check: ", err)
+	}
+}
