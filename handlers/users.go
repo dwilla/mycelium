@@ -117,37 +117,46 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	}{}
 
 	if err := datastar.ReadSignals(r, &signals); err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	hashedPass, err := auth.HashPassword(signals.Password)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
 	newUser, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Email:        signals.Email,
 		Username:     signals.Username,
 		PasswordHash: sql.NullString{String: hashedPass},
 	})
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
 	newToken, err := auth.MakeRefreshToken()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
 	refreshToken, err := cfg.DB.MakeToken(r.Context(), database.MakeTokenParams{
 		Token:     newToken,
 		UserID:    newUser.ID,
 		ExpiresAt: time.Now().Add(1440 * time.Hour),
 	})
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	token, err := auth.MakeJWT(newUser.ID, cfg.JwtSecret, time.Hour)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -170,13 +179,16 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(1440 * time.Hour),
 	})
 	sse := datastar.NewSSE(w, r)
-	if err := sse.MergeSignals([]byte(`{auth: true}`)); err != nil {
-		http.Error(w, "can't update signals", 500)
+
+	if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
+		http.Error(w, "can't update signals", http.StatusInternalServerError)
+		return
 	}
 
 	component := templates.Home()
 	if err := sse.MergeFragmentTempl(component); err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
