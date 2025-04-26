@@ -6,7 +6,6 @@ templ Login() {
         <div id="errors"></div>
         <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
             <div>
-                <div id="errors"></div>
                 <p data-show="$valid == false">Enter Valid Email</p>
                 <p data-show="$valid == true && $exists == false">Create an account:</p>
                 <p data-show="$valid == true && $exists == true">Welcome Back!</p>
@@ -27,7 +26,7 @@ templ Login() {
                 <div data-show="$valid == true && $exists == true" data-on-signal-change-password="@get('/auth/password')">
                     <label>Password:</label> <input type="password" data-bind="password">
                     <br>
-                    <button data-show="$user-valid == true && $pass-valid == true" data-on-click="@post('/auth/login')">Sign In</button>
+                    <button data-show="$pass-valid == true" data-on-click="@post('/auth/login')">Sign In</button>
                 </div>
             </div>
         </div>
