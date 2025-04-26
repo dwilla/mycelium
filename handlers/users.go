@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -75,6 +76,11 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	// Log the cookie settings
+	log.Printf("Setting cookies for domain: %s", r.Host)
+	log.Printf("Token length: %d", len(token))
+	log.Printf("Refresh token length: %d", len(refreshToken.Token))
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
