@@ -22,5 +22,8 @@
     }
   ],
   "scope": "/",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "categories": ["social", "utilities"],
+  "screenshots": [],
+  "shortcuts": []
 } 

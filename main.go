@@ -44,6 +44,19 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	// Serve static files
+	fs := http.FileServer(http.Dir("static"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Serve manifest.json and sw.js at the root
+	mux.HandleFunc("/manifest.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/manifest.json")
+	})
+	mux.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/sw.js")
+	})
+
 	mux.HandleFunc("/", cfg.HandleMain)
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
 	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
