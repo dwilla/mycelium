@@ -4,6 +4,7 @@ templ Login() {
     <div id="app">
         <h1>Welcome to Mycelium</h1>
         <div id="errors"></div>
+        <div id="msg"></div>
         <div id="user" data-signals="{email: '', username: '', password: '', exists: false, valid: false, 'user-valid': false, 'pass-valid': false}">
             <div>
                 <p data-show="$valid == false">Enter Valid Email</p>
@@ -27,6 +28,7 @@ templ Login() {
                     <label>Password:</label> <input type="password" data-bind="password">
                     <br>
                     <button data-show="$pass-valid == true" data-on-click="@post('/auth/login')">Sign In</button>
+                    <button data-on-click="@post('/email/reset')">Forgot Password</button>
                 </div>
             </div>
         </div>

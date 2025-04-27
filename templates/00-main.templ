@@ -1,6 +1,6 @@
 package templates
 
-templ Main() {
+templ Main(loadApp bool) {
     <!DOCTYPE html>
     <html>
         <head>
@@ -9,7 +9,23 @@ templ Main() {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="csrf-token" content="{ csrfToken }">
+            <meta name="theme-color" content="#000000">
+            <link rel="manifest" href="/static/manifest.json">
+            <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
             <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
+            <script>
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/static/sw.js')
+                            .then(registration => {
+                                console.log('ServiceWorker registration successful');
+                            })
+                            .catch(err => {
+                                console.log('ServiceWorker registration failed: ', err);
+                            });
+                    });
+                }
+            </script>
         </head>
         <body>
             <div data-signals="{auth: false}">
@@ -19,8 +35,13 @@ templ Main() {
                         <a data-show="$auth == true" href="/auth/logout">Sign Out</a>
                     </nav>
                 </header>
-                <div id="app" data-on-load="@get('/app')">
-                </div>
+                if loadApp {
+                    <div id="app" data-on-load="@get('/app')">
+                    </div>
+                } else {
+                    <div id="app">
+                    </div>
+                }
             </div>
             <footer>
                 <!-- Add your footer here -->
