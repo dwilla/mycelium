@@ -1,0 +1,18 @@
+package templates
+
+templ Reset(uuid string) {
+    <div id="app">
+    <h1>Reset Password</h1>
+    <div id="errors"></div>
+    <div id="msg"></div>
+    <div id="reset" data-signals="{password: '', 'pass-valid': false}">
+        <div data-on-signal-change-password="@get('/auth/password')">
+            <label>New Password:</label>
+            <input type="password" data-bind="password">
+            <p data-show="$pass-valid == false">Invalid password. Must be 12 characters long.</p>
+            <br>
+            <button data-show="$pass-valid == true" data-on-click={ "@post('/reset/" + uuid + "')" }>Reset Password</button>
+        </div>
+    </div>
+    </div>
+} 

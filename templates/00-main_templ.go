@@ -8,7 +8,7 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Main() templ.Component {
+func Main(loadApp bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +29,22 @@ func Main() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><title>Mycelium</title><link rel=\"stylesheet\" href=\"/static/styles.css\"><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"csrf-token\" content=\"{ csrfToken }\"><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js\"></script></head><body><div data-signals=\"{auth: false}\"><header><nav><button>Account</button> <a data-show=\"$auth == true\" href=\"/auth/logout\">Sign Out</a></nav></header><div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\"></div></div><footer><!-- Add your footer here --></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><title>Mycelium</title><link rel=\"stylesheet\" href=\"/static/styles.css\"><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"csrf-token\" content=\"{ csrfToken }\"><meta name=\"theme-color\" content=\"#000000\"><link rel=\"manifest\" href=\"/static/manifest.json\"><link rel=\"apple-touch-icon\" href=\"/static/icons/icon-192x192.png\"><script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js\"></script><script>\n                if ('serviceWorker' in navigator) {\n                    window.addEventListener('load', () => {\n                        navigator.serviceWorker.register('/static/sw.js')\n                            .then(registration => {\n                                console.log('ServiceWorker registration successful');\n                            })\n                            .catch(err => {\n                                console.log('ServiceWorker registration failed: ', err);\n                            });\n                    });\n                }\n            </script></head><body><div data-signals=\"{auth: false}\"><header><nav><button>Account</button> <a data-show=\"$auth == true\" href=\"/auth/logout\">Sign Out</a></nav></header>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if loadApp {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"app\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><footer><!-- Add your footer here --></footer></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

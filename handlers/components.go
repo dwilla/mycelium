@@ -8,7 +8,7 @@ import (
 )
 
 func (cfg Config) HandleMain(w http.ResponseWriter, r *http.Request) {
-	component := templates.Main()
+	component := templates.Main(true)
 	if err := component.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), 500)
 	}

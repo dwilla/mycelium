@@ -20,6 +20,10 @@ func main() {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
 	}
 
+	cfg.Mailgun = os.Getenv("MAILGUN_KEY")
+	if cfg.Mailgun == "" {
+		log.Fatal("no mailgun key")
+	}
 	cfg.JwtSecret = os.Getenv("TOKEN_SECRET")
 	if cfg.JwtSecret == "" {
 		log.Fatal("no token secret")
@@ -32,6 +36,13 @@ func main() {
 	dbQueries := database.New(db)
 	cfg.DB = dbQueries
 
+	isProduction := os.Getenv("RENDER") == "true"
+	if isProduction {
+		cfg.BaseURL = "https://mycelium.chat"
+	} else {
+		cfg.BaseURL = "https://localhost:" + os.Getenv("PORT")
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", cfg.HandleMain)
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
@@ -39,26 +50,23 @@ func main() {
 	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
 	mux.HandleFunc("POST /auth/newuser", cfg.HandleNewUser)
 	mux.HandleFunc("POST /auth/login", cfg.HandleLogin)
+	mux.HandleFunc("POST /email/reset", cfg.SendPassReset)
+	mux.HandleFunc("GET /reset/{uuid}", cfg.HandleReset)
+	mux.HandleFunc("POST /reset/{uuid}", cfg.HandleResetPost)
 	mux.HandleFunc("/auth/logout", cfg.HandleSignOut)
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
-	// Create a single server with proper TLS configuration
 	server := &http.Server{
 		Addr:              ":" + os.Getenv("PORT"),
 		Handler:           mux,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
-	// Check if we're in production (Render sets this)
-	isProduction := os.Getenv("RENDER") == "true"
-
 	if isProduction {
-		// In production, Render handles HTTPS termination
-		log.Printf("Server running in production mode at: http://localhost:%v\n", os.Getenv("PORT"))
+		log.Println("Server running in production mode.")
 		log.Fatal(server.ListenAndServe())
 	} else {
-		// In development, use self-signed certificates
-		log.Printf("Server running in development mode at: https://localhost:%v\n", os.Getenv("PORT"))
+		log.Printf("Server running in development mode at: %v\n", cfg.BaseURL)
 		log.Fatal(server.ListenAndServeTLS("certs/cert.pem", "certs/key.pem"))
 	}
 }

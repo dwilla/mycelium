@@ -14,8 +14,14 @@ require (
 
 require (
 	github.com/delaneyj/gostar v0.8.0 // indirect
+	github.com/go-chi/chi/v5 v5.2.1 // indirect
 	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/igrmk/treemap/v2 v2.0.1 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/mailgun/errors v0.4.0 // indirect
+	github.com/mailgun/mailgun-go/v4 v4.23.0 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/samber/lo v1.47.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect

@@ -9,6 +9,7 @@ import (
 	"github.com/dwilla/mycelium/internal/auth"
 	"github.com/dwilla/mycelium/internal/database"
 	"github.com/dwilla/mycelium/templates"
+	"github.com/google/uuid"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
@@ -273,5 +274,74 @@ func (cfg Config) CheckPassword(w http.ResponseWriter, r *http.Request) {
 
 	if err := sse.MergeSignals([]byte(`{'pass-valid': true}`)); err != nil {
 		http.Error(w, err.Error(), 500)
+	}
+}
+
+func (cfg Config) HandleReset(w http.ResponseWriter, r *http.Request) {
+	uuid := r.PathValue("uuid")
+	if uuid == "" {
+		respondWithErrors(w, r, "Invalid reset link", nil)
+		return
+	}
+
+	main := templates.Main(false)
+	reset := templates.Reset(uuid)
+
+	if err := main.Render(r.Context(), w); err != nil {
+		respondWithErrors(w, r, "Couldn't render main", err)
+		return
+	}
+
+	if err := reset.Render(r.Context(), w); err != nil {
+		respondWithErrors(w, r, "Couldn't render reset template", err)
+		return
+	}
+}
+
+func (cfg Config) HandleResetPost(w http.ResponseWriter, r *http.Request) {
+	urlUUID := r.PathValue("uuid")
+	if urlUUID == "" {
+		respondWithErrors(w, r, "Invalid reset link", nil)
+		return
+	}
+
+	signals := struct {
+		Password string `json:"password"`
+	}{}
+	if err := datastar.ReadSignals(r, &signals); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	hashedPass, err := auth.HashPassword(signals.Password)
+	if err != nil {
+		respondWithErrors(w, r, "Error processing password", err)
+		return
+	}
+
+	userID, err := uuid.Parse(urlUUID)
+	if err != nil {
+		respondWithErrors(w, r, "Invalid user ID"+userID.String(), err)
+		return
+	}
+
+	err = cfg.DB.UpdatePassword(r.Context(), database.UpdatePasswordParams{
+		ID:           userID,
+		PasswordHash: sql.NullString{String: hashedPass, Valid: true},
+	})
+	if err != nil {
+		respondWithErrors(w, r, "Error updating password", err)
+		return
+	}
+
+	sse := datastar.NewSSE(w, r)
+	if err := sse.MergeSignals([]byte(`{"auth":false}`)); err != nil {
+		http.Error(w, "can't update signals", http.StatusInternalServerError)
+		return
+	}
+
+	if err := sse.ExecuteScript("window.location = '/'"); err != nil {
+		http.Error(w, "can't execute redirect", http.StatusInternalServerError)
+		return
 	}
 }
