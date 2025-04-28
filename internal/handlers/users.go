@@ -103,7 +103,13 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := templates.Home()
+	channels, err := cfg.DB.GetChannelsForUser(r.Context(), user.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error with channels", err)
+		return
+	}
+
+	component := templates.Home(channels)
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -186,7 +192,13 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := templates.Home()
+	channels, err := cfg.DB.GetChannelsForUser(r.Context(), newUser.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error with channels", err)
+		return
+	}
+
+	component := templates.Home(channels)
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

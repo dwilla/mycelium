@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dwilla/mycelium/templates"
@@ -15,7 +16,18 @@ func (cfg Config) HandleMain(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg Config) HandleHome(w http.ResponseWriter, r *http.Request) {
-	component := templates.Home()
+	user, ok := GetCurrentUser(r)
+	if !ok {
+		respondWithErrors(w, r, "user not authenticated", fmt.Errorf("user not authenticated"))
+		return
+	}
+	channels, err := cfg.DB.GetChannelsForUser(r.Context(), user.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error with channels", err)
+		return
+	}
+
+	component := templates.Home(channels)
 	sse := datastar.NewSSE(w, r)
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), 500)

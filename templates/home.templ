@@ -1,8 +1,15 @@
 package templates
 
-templ Home() {
+import "github.com/dwilla/mycelium/internal/database"
+
+templ Home(channelList []database.GetChannelsForUserRow) {
     <div id="app">
         <h1>Welcome Home!</h1>
         <div id="errors"></div>
+    </div>
+    <div id="channels">
+        for _, channel := range channelList {
+            <div id="channel">{ channel.Name }</div>
+        }
     </div>
 }

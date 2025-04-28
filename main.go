@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/dwilla/mycelium/handlers"
 	"github.com/dwilla/mycelium/internal/database"
+	"github.com/dwilla/mycelium/internal/handlers"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
@@ -58,6 +58,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/", cfg.HandleMain)
+	// Login, logout, passwords
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
 	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
 	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
@@ -67,6 +68,7 @@ func main() {
 	mux.HandleFunc("GET /reset/{uuid}", cfg.HandleReset)
 	mux.HandleFunc("POST /reset/{uuid}", cfg.HandleResetPost)
 	mux.HandleFunc("/auth/logout", cfg.HandleSignOut)
+	// Regular app view
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
 
 	server := &http.Server{
