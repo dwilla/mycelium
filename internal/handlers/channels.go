@@ -10,12 +10,22 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
+type ViewChannel struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type channelSignals struct {
+	ViewChannel ViewChannel `json:"viewChannel"`
+}
+
 func (cfg Config) HandleNewChannelComponent(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
 	component := templates.NewChannel()
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		respondWithErrors(w, r, "error getting new component", err)
+		return
 	}
 }
 
@@ -52,10 +62,21 @@ func (cfg Config) HandleNewChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := templates.Home(newChannel)
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{
+			ID:   newChannel.ID.String(),
+			Name: newChannel.Name,
+		},
+	}
+
+	component := templates.Home()
 
 	sse := datastar.NewSSE(w, r)
 	if err := sse.MergeFragmentTempl(component); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

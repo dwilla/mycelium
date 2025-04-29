@@ -3,7 +3,7 @@ package templates
 templ NewChannel() {
     <div id="app">
         <div id="errors"></div>
-        <div id="new-channel" data-show="$viewChannel.id == ''" data-signals="{name: '', existing: false}">
+        <div id="new-channel" data-signals="{name: '', existing: false}">
             <p>Create new channel, or join an existing one.</p>
             <label>New channel name or existing channel id:</label>
             <input type="text" data-bind="name">

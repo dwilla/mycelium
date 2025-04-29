@@ -16,18 +16,28 @@ func (cfg Config) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(channelID))
+	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(channelID)) //use this channel
 	if err != nil {
 		respondWithErrors(w, r, "error getting channel", err)
 		return
 	}
 
-	component := templates.Chat(channel)
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{
+			ID:   channel.ID.String(),
+			Name: channel.Name,
+		},
+	}
+
+	component := templates.Chat()
 
 	sse := datastar.NewSSE(w, r)
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		respondWithErrors(w, r, "error merging signals", err)
+		return
+	}
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		respondWithErrors(w, r, "error merging component", err)
 		return
 	}
-
 }
