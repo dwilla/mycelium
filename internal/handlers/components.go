@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dwilla/mycelium/internal/database"
 	"github.com/dwilla/mycelium/templates"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
@@ -27,18 +26,23 @@ func (cfg Config) HandleHome(w http.ResponseWriter, r *http.Request) {
 		respondWithErrors(w, r, "error with channels", err)
 		return
 	}
-	viewChannel := database.Channel{}
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{},
+	}
 	if len(channels) != 0 {
-		viewChannel, err = cfg.DB.GetChannelByID(r.Context(), channels[0].ID)
-		if err != nil {
-			respondWithErrors(w, r, "database error", err)
-			return
-		}
+		viewSignals.ViewChannel.ID = channels[0].ID.String()
+		viewSignals.ViewChannel.Name = channels[0].Name
 	}
 
-	component := templates.Home(viewChannel)
+	component := templates.Home()
 	sse := datastar.NewSSE(w, r)
+
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), 500)
+		return
 	}
 }

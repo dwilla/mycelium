@@ -108,16 +108,18 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		respondWithErrors(w, r, "error with channels", err)
 		return
 	}
-	viewChannel := database.Channel{}
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{},
+	}
 	if len(channels) != 0 {
-		viewChannel, err = cfg.DB.GetChannelByID(r.Context(), channels[0].ID)
-		if err != nil {
-			respondWithErrors(w, r, "database error", err)
-			return
-		}
+		viewSignals.ViewChannel.ID = channels[0].ID.String()
+		viewSignals.ViewChannel.Name = channels[0].Name
 	}
 
-	component := templates.Home(viewChannel)
+	component := templates.Home()
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -196,19 +198,21 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 	channels, err := cfg.DB.GetChannelsForUser(r.Context(), newUser.ID)
 	if err != nil {
-		respondWithErrors(w, r, "error getting channels", err)
+		respondWithErrors(w, r, "error with channels", err)
 		return
 	}
-	channel := database.Channel{}
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{},
+	}
 	if len(channels) != 0 {
-		channel, err = cfg.DB.GetChannelByID(r.Context(), channels[0].ID)
-		if err != nil {
-			respondWithErrors(w, r, "error getting view channel", err)
-			return
-		}
+		viewSignals.ViewChannel.ID = channels[0].ID.String()
+		viewSignals.ViewChannel.Name = channels[0].Name
 	}
 
-	component := templates.Home(channel)
+	component := templates.Home()
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), 500)
 		return

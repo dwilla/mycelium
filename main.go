@@ -9,6 +9,7 @@ import (
 
 	"github.com/dwilla/mycelium/internal/database"
 	"github.com/dwilla/mycelium/internal/handlers"
+	"github.com/dwilla/mycelium/internal/pubsub"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
@@ -35,6 +36,9 @@ func main() {
 	}
 	dbQueries := database.New(db)
 	cfg.DB = dbQueries
+
+	pubsub := pubsub.New()
+	typingHandler := handlers.NewTypingHandler(pubsub)
 
 	isProduction := os.Getenv("RENDER") == "true"
 	if isProduction {
@@ -74,6 +78,8 @@ func main() {
 	mux.Handle("GET /channels/new", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannelComponent)))
 	mux.Handle("POST /channels", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannel)))
 	mux.Handle("GET /chat/{id}", cfg.Auth(http.HandlerFunc(cfg.HandleGetChat)))
+	mux.Handle("POST /typing", cfg.Auth(http.HandlerFunc(typingHandler.HandleTyping)))
+	mux.Handle("GET /typing-events", cfg.Auth(http.HandlerFunc(typingHandler.HandleTypingEvents)))
 
 	server := &http.Server{
 		Addr:              ":" + os.Getenv("PORT"),
