@@ -31,13 +31,19 @@ func (h *TypingHandler) HandleTypingEvents(w http.ResponseWriter, r *http.Reques
 		case event := <-events:
 			// Send the message event to the client
 			data, _ := json.Marshal(event)
-			w.Write([]byte("data: " + string(data) + "\n\n"))
+			_, err := w.Write([]byte("data: " + string(data) + "\n\n"))
+			if err != nil {
+				respondWithErrors(w, r, "writing error in typeing events", err)
+			}
 			w.(http.Flusher).Flush()
 		case <-clientGone:
 			return
 		case <-time.After(30 * time.Second):
 			// Send a keep-alive comment
-			w.Write([]byte(": keepalive\n\n"))
+			_, err := w.Write([]byte(": keepalive\n\n"))
+			if err != nil {
+				respondWithErrors(w, r, "writing error in typeing events", err)
+			}
 			w.(http.Flusher).Flush()
 		}
 	}
