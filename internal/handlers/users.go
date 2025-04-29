@@ -98,12 +98,26 @@ func (cfg Config) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	sse := datastar.NewSSE(w, r)
 
-	if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
+	if err := sse.MergeSignals([]byte(`{"auth":true, "password": ''}`)); err != nil {
 		http.Error(w, "can't update signals", http.StatusInternalServerError)
 		return
 	}
 
-	component := templates.Home()
+	channels, err := cfg.DB.GetChannelsForUser(r.Context(), user.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error with channels", err)
+		return
+	}
+	viewChannel := database.Channel{}
+	if len(channels) != 0 {
+		viewChannel, err = cfg.DB.GetChannelByID(r.Context(), channels[0].ID)
+		if err != nil {
+			respondWithErrors(w, r, "database error", err)
+			return
+		}
+	}
+
+	component := templates.Home(viewChannel)
 	if err := sse.MergeFragmentTempl(component); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -180,15 +194,23 @@ func (cfg Config) HandleNewUser(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(1440 * time.Hour),
 	})
 	sse := datastar.NewSSE(w, r)
-
-	if err := sse.MergeSignals([]byte(`{"auth":true}`)); err != nil {
-		http.Error(w, "can't update signals", http.StatusInternalServerError)
+	channels, err := cfg.DB.GetChannelsForUser(r.Context(), newUser.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error getting channels", err)
 		return
 	}
+	channel := database.Channel{}
+	if len(channels) != 0 {
+		channel, err = cfg.DB.GetChannelByID(r.Context(), channels[0].ID)
+		if err != nil {
+			respondWithErrors(w, r, "error getting view channel", err)
+			return
+		}
+	}
 
-	component := templates.Home()
+	component := templates.Home(channel)
 	if err := sse.MergeFragmentTempl(component); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 }
@@ -335,7 +357,7 @@ func (cfg Config) HandleResetPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sse := datastar.NewSSE(w, r)
-	if err := sse.MergeSignals([]byte(`{"auth":false}`)); err != nil {
+	if err := sse.MergeSignals([]byte(`{"auth":false, "password": ''}`)); err != nil {
 		http.Error(w, "can't update signals", http.StatusInternalServerError)
 		return
 	}

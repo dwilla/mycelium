@@ -1,0 +1,14 @@
+package templates
+
+templ NewChannel() {
+    <div id="app">
+        <div id="errors"></div>
+        <div id="new-channel" data-show="$viewChannel.id == ''" data-signals="{name: '', existing: false}">
+            <p>Create new channel, or join an existing one.</p>
+            <label>New channel name or existing channel id:</label>
+            <input type="text" data-bind="name">
+            <button data-show="$existing == false && $name != ''" data-on-click="@post('/channels')">Create New Channel</button>
+            <button data-show="$existing == true" data-on-click="@post('/subs')">Join Channel</button>
+        </div>
+    </div>
+}

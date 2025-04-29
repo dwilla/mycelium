@@ -1,8 +1,30 @@
 package templates
 
-templ Home() {
+import "github.com/dwilla/mycelium/internal/database"
+
+templ Home(viewChannel database.Channel) {
     <div id="app">
         <h1>Welcome Home!</h1>
         <div id="errors"></div>
+        @Channels()
+        @Chat(viewChannel)
     </div>
 }
+
+templ Chat(channel database.Channel) {
+    <div id="chat">
+            <div id="view" data-show="$viewChannel.id != ''">
+                <h3>Viewing: { channel.Name }</h3>
+            </div>
+        </div>
+}
+
+templ Channels() {
+    <div id="channels">
+        <div id="user-channels" data-on-load="@get('/channels')"></div>
+        <div>
+            <button data-on-click="@get('/channels/new')">Add or Join Channel</button>
+        </div>
+    </div>
+}
+
