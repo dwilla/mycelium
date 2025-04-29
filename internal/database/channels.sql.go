@@ -11,8 +11,35 @@ import (
 	"github.com/google/uuid"
 )
 
+const createChannel = `-- name: CreateChannel :one
+INSERT INTO channels (id, name, creator)
+VALUES (
+    gen_random_uuid(),
+    $1,
+    $2
+) RETURNING id, name, creator, created_at, updated_at
+`
+
+type CreateChannelParams struct {
+	Name    string
+	Creator uuid.UUID
+}
+
+func (q *Queries) CreateChannel(ctx context.Context, arg CreateChannelParams) (Channel, error) {
+	row := q.db.QueryRowContext(ctx, createChannel, arg.Name, arg.Creator)
+	var i Channel
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Creator,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getChannelByID = `-- name: GetChannelByID :one
-SELECT id, name, created_at, updated_at FROM channels 
+SELECT id, name, creator, created_at, updated_at FROM channels 
 WHERE id = $1
 `
 
@@ -22,6 +49,7 @@ func (q *Queries) GetChannelByID(ctx context.Context, id uuid.UUID) (Channel, er
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Creator,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -29,7 +57,7 @@ func (q *Queries) GetChannelByID(ctx context.Context, id uuid.UUID) (Channel, er
 }
 
 const getChannelByName = `-- name: GetChannelByName :one
-SELECT id, name, created_at, updated_at FROM channels
+SELECT id, name, creator, created_at, updated_at FROM channels
 WHERE name SIMILAR TO $1
 `
 
@@ -39,6 +67,7 @@ func (q *Queries) GetChannelByName(ctx context.Context, similarToEscape string) 
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Creator,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -46,7 +75,7 @@ func (q *Queries) GetChannelByName(ctx context.Context, similarToEscape string) 
 }
 
 const getChannels = `-- name: GetChannels :many
-SELECT id, name, created_at, updated_at FROM channels
+SELECT id, name, creator, created_at, updated_at FROM channels
 `
 
 func (q *Queries) GetChannels(ctx context.Context) ([]Channel, error) {
@@ -61,6 +90,7 @@ func (q *Queries) GetChannels(ctx context.Context) ([]Channel, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.Creator,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

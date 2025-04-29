@@ -14,6 +14,7 @@ import (
 type Channel struct {
 	ID        uuid.UUID
 	Name      string
+	Creator   uuid.UUID
 	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime
 }

@@ -11,6 +11,39 @@ import (
 	"github.com/google/uuid"
 )
 
+const createSub = `-- name: CreateSub :many
+INSERT INTO subs (user_id, channel_id)
+VALUES ($1, $2) RETURNING user_id, channel_id, notifications
+`
+
+type CreateSubParams struct {
+	UserID    uuid.UUID
+	ChannelID uuid.UUID
+}
+
+func (q *Queries) CreateSub(ctx context.Context, arg CreateSubParams) ([]Sub, error) {
+	rows, err := q.db.QueryContext(ctx, createSub, arg.UserID, arg.ChannelID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Sub
+	for rows.Next() {
+		var i Sub
+		if err := rows.Scan(&i.UserID, &i.ChannelID, &i.Notifications); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getChannelsForUser = `-- name: GetChannelsForUser :many
 SELECT channels.id, channels.name FROM subs
 INNER JOIN channels ON subs.channel_id = channels.id

@@ -70,6 +70,10 @@ func main() {
 	mux.HandleFunc("/auth/logout", cfg.HandleSignOut)
 	// Regular app view
 	mux.Handle("/app", cfg.Auth(http.HandlerFunc(cfg.HandleHome)))
+	mux.Handle("GET /channels", cfg.Auth(http.HandlerFunc(cfg.GetUserChannels)))
+	mux.Handle("GET /channels/new", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannelComponent)))
+	mux.Handle("POST /channels", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannel)))
+	mux.Handle("GET /chat/{id}", cfg.Auth(http.HandlerFunc(cfg.HandleGetChat)))
 
 	server := &http.Server{
 		Addr:              ":" + os.Getenv("PORT"),
