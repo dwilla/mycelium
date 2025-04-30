@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -36,6 +38,17 @@ func (cfg Config) HandleNewChannel(w http.ResponseWriter, r *http.Request) {
 		respondWithErrors(w, r, "Authentication issue", fmt.Errorf("error finding authenticated user"))
 		return
 	}
+
+	// Log the request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading request body: %v", err)
+	} else {
+		log.Printf("Request body: %s", string(body))
+		// Restore the request body so it can be read again
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
+	}
+
 	signal := struct {
 		NewChanName string `json:"newChanName"`
 	}{}
