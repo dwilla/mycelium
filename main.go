@@ -66,6 +66,7 @@ func main() {
 	mux.HandleFunc("GET /auth/email", cfg.CheckEmail)
 	mux.HandleFunc("GET /auth/username", cfg.CheckUsername)
 	mux.HandleFunc("GET /auth/password", cfg.CheckPassword)
+	mux.HandleFunc("GET /auth/channel", cfg.HandleCheckChannel)
 	mux.HandleFunc("POST /auth/newuser", cfg.HandleNewUser)
 	mux.HandleFunc("POST /auth/login", cfg.HandleLogin)
 	mux.HandleFunc("POST /email/reset", cfg.SendPassReset)
@@ -78,6 +79,7 @@ func main() {
 	mux.Handle("GET /channels/new", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannelComponent)))
 	mux.Handle("POST /channels", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannel)))
 	mux.Handle("GET /chat/{id}", cfg.Auth(http.HandlerFunc(cfg.HandleGetChat)))
+	mux.Handle("POST /subs", cfg.Auth(http.HandlerFunc(cfg.HandleNewSub)))
 	mux.Handle("POST /typing", cfg.Auth(http.HandlerFunc(typingHandler.HandleTyping)))
 	mux.Handle("GET /typing-events", cfg.Auth(http.HandlerFunc(typingHandler.HandleTypingEvents)))
 

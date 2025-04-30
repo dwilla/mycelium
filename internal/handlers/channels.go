@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"bytes"
+	"database/sql"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/dwilla/mycelium/internal/database"
 	"github.com/dwilla/mycelium/templates"
+	"github.com/google/uuid"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
@@ -37,16 +37,6 @@ func (cfg Config) HandleNewChannel(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		respondWithErrors(w, r, "Authentication issue", fmt.Errorf("error finding authenticated user"))
 		return
-	}
-
-	// Log the request body
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("Error reading request body: %v", err)
-	} else {
-		log.Printf("Request body: %s", string(body))
-		// Restore the request body so it can be read again
-		r.Body = io.NopCloser(bytes.NewBuffer(body))
 	}
 
 	signal := struct {
@@ -124,5 +114,97 @@ func (cfg Config) GetUserChannels(w http.ResponseWriter, r *http.Request) {
 
 	if err := sse.MergeFragments(fragments.String()); err != nil {
 		respondWithErrors(w, r, "error merging fragments", err)
+	}
+}
+
+func (cfg Config) HandleCheckChannel(w http.ResponseWriter, r *http.Request) {
+	signal := struct {
+		NewChanName string `json:"newChanName"`
+	}{}
+
+	if err := datastar.ReadSignals(r, &signal); err != nil {
+		log.Println("Value for name signal: ", signal.NewChanName)
+		respondWithErrors(w, r, "Signal read issue", err)
+		return
+	}
+
+	if len(signal.NewChanName) != 36 {
+		sse := datastar.NewSSE(w, r)
+		if err := sse.MergeSignals([]byte(`{"chanExisting": false}`)); err != nil {
+			respondWithErrors(w, r, "error updating signals", err)
+			return
+		}
+		return
+	}
+
+	_, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(signal.NewChanName))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			sse := datastar.NewSSE(w, r)
+			if err := sse.MergeSignals([]byte(`{"chanExisting": false}`)); err != nil {
+				respondWithErrors(w, r, "error updating signals", err)
+				return
+			}
+			return
+		}
+		respondWithErrors(w, r, "error accessing db", err)
+		return
+	}
+
+	sse := datastar.NewSSE(w, r)
+	if err := sse.MergeSignals([]byte(`{"chanExisting": true}`)); err != nil {
+		respondWithErrors(w, r, "error updating signals", err)
+		return
+	}
+}
+
+func (cfg Config) HandleNewSub(w http.ResponseWriter, r *http.Request) {
+	user, ok := GetCurrentUser(r)
+	if !ok {
+		respondWithErrors(w, r, "authentication error", fmt.Errorf("auth error"))
+	}
+
+	signal := struct {
+		NewChanName string `json:"newChanName"`
+	}{}
+
+	if err := datastar.ReadSignals(r, &signal); err != nil {
+		log.Println("Value for name signal: ", signal.NewChanName)
+		respondWithErrors(w, r, "Signal read issue", err)
+		return
+	}
+
+	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(signal.NewChanName))
+	if err != nil {
+		respondWithErrors(w, r, "error accessing db", err)
+		return
+	}
+
+	_, err = cfg.DB.CreateSub(r.Context(), database.CreateSubParams{
+		UserID:    user.ID,
+		ChannelID: channel.ID,
+	})
+	if err != nil {
+		respondWithErrors(w, r, "subs database error", err)
+		return
+	}
+
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{
+			ID:   channel.ID.String(),
+			Name: channel.Name,
+		},
+	}
+
+	component := templates.Home()
+
+	sse := datastar.NewSSE(w, r)
+	if err := sse.MergeFragmentTempl(component); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }

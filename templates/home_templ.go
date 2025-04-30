@@ -70,7 +70,7 @@ func Chat() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"chat\"><div id=\"view\" data-show=\"$viewChannel.id != &#39;&#39;\" data-signals=\"{msg: &#39;&#39;}\"><h2>Viewing:</h2><h3 data-text=\"$viewChannel.name\"></h3><div id=\"typing-events\" data-on-load=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\"></div><input type=\"text\" data-bind=\"$msg\" data-on-input=\"@post(&#39;/typing?channel=&#39; + $viewChannel.id + &#39;&amp;message=&#39; + $msg)\"> <button data-show=\"$msg != &#39;&#39;\" data-on-click=\"@post(&#39;/message&#39;)\">Send</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"chat\"><div id=\"view\" data-show=\"$viewChannel.id != &#39;&#39;\" data-signals=\"{msg: &#39;&#39;, typingEvent: &#39;&#39;}\"><h2>Viewing:</h2><h3 data-text=\"$viewChannel.name\"></h3><div id=\"typing-events\" data-on-load=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\"><div id=\"type-event\" data-text=\"$typingEvent\"></div></div><input type=\"text\" data-bind=\"$msg\" data-on-input=\"@post(&#39;/typing?channel=&#39; + $viewChannel.id + &#39;&amp;message=&#39; + $msg)\"> <button data-show=\"$msg != &#39;&#39;\" data-on-click=\"@post(&#39;/message&#39;)\">Send</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
