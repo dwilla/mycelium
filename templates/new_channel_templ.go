@@ -29,7 +29,7 @@ func NewChannel() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\"><div id=\"errors\"></div><div id=\"new-channel\" data-signals=\"{name: &#39;&#39;, existing: false}\"><p>Create new channel, or join an existing one.</p><label>New channel name or existing channel id:</label> <input type=\"text\" data-bind=\"name\"> <button data-show=\"$existing == false &amp;&amp; $name != &#39;&#39;\" data-on-click=\"@post(&#39;/channels&#39;)\">Create New Channel</button> <button data-show=\"$existing == true\" data-on-click=\"@post(&#39;/subs&#39;)\">Join Channel</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\"><div id=\"errors\"></div><div id=\"new-channel\" data-signals=\"{newChanName: &#39;&#39;, existing: false}\"><p>Create new channel, or join an existing one.</p><label>New channel name or existing channel id:</label> <input type=\"text\" data-bind=\"newChanName\"> <button data-show=\"$existing == false &amp;&amp; $newChanName != &#39;&#39;\" data-on-click=\"@post(&#39;/channels&#39;)\">Create New Channel</button> <button data-show=\"$existing == true\" data-on-click=\"@post(&#39;/subs&#39;)\">Join Channel</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
