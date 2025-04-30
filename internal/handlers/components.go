@@ -9,7 +9,11 @@ import (
 )
 
 func (cfg Config) HandleMain(w http.ResponseWriter, r *http.Request) {
-	component := templates.Main(true)
+	tokenCookie, _ := r.Cookie("token")
+	refreshCookie, _ := r.Cookie("refresh-token")
+	isAuthenticated := tokenCookie != nil || refreshCookie != nil
+
+	component := templates.Main(true, isAuthenticated)
 	if err := component.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
