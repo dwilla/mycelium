@@ -310,7 +310,7 @@ func (cfg Config) HandleReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	main := templates.Main(false)
+	main := templates.Main(false, false)
 	reset := templates.Reset(uuid)
 
 	if err := main.Render(r.Context(), w); err != nil {
