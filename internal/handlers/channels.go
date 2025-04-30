@@ -37,17 +37,17 @@ func (cfg Config) HandleNewChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	signal := struct {
-		Name string `json:"name"`
+		NewChanName string `json:"newChanName"`
 	}{}
 
 	if err := datastar.ReadSignals(r, &signal); err != nil {
-		log.Println("Value for name signal: ", signal.Name)
+		log.Println("Value for name signal: ", signal.NewChanName)
 		respondWithErrors(w, r, "Signal read issue", err)
 		return
 	}
 
 	newChannel, err := cfg.DB.CreateChannel(r.Context(), database.CreateChannelParams{
-		Name:    signal.Name,
+		Name:    signal.NewChanName,
 		Creator: user.ID,
 	})
 	if err != nil {
