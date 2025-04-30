@@ -30,8 +30,14 @@ func (h *TypingHandler) HandleTypingEvents(w http.ResponseWriter, r *http.Reques
 	for {
 		select {
 		case event := <-events:
-			if err := sse.MergeSignals(fmt.Appendf(nil, `{"typingEvent": "%s: %s"}`, event.Username, event.Message)); err != nil {
-				return
+			if event.Message == "" {
+				if err := sse.MergeSignals([]byte(`{"typingEvent": ""}`)); err != nil {
+					return
+				}
+			} else {
+				if err := sse.MergeSignals(fmt.Appendf(nil, `{"typingEvent": "%s: %s"}`, event.Username, event.Message)); err != nil {
+					return
+				}
 			}
 		case <-clientGone:
 			return

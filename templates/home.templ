@@ -3,7 +3,6 @@ package templates
 
 templ Home() {
     <div id="app">
-        <h1>Welcome Home!</h1>
         <div id="errors"></div>
         @Channels()
         @Chat()
@@ -13,7 +12,6 @@ templ Home() {
 templ Chat() {
     <div id="chat">
         <div id="view" data-show="$viewChannel.id != ''" data-signals="{msg: '', typingEvent: ''}">
-            <h2>Viewing:</h2>
             <h3 data-text="$viewChannel.name"></h3>
             <div id="typing-events" data-on-load="@get('/typing-events?channel=' + $viewChannel.id)">
                 <div id="type-event" data-text="$typingEvent"></div>
