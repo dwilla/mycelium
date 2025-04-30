@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -36,16 +37,17 @@ func (cfg Config) HandleNewChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	signal := struct {
-		NewName string `json:"name"`
+		Name string `json:"name"`
 	}{}
 
 	if err := datastar.ReadSignals(r, &signal); err != nil {
+		log.Println("Value for name signal: ", signal.Name)
 		respondWithErrors(w, r, "Signal read issue", err)
 		return
 	}
 
 	newChannel, err := cfg.DB.CreateChannel(r.Context(), database.CreateChannelParams{
-		Name:    signal.NewName,
+		Name:    signal.Name,
 		Creator: user.ID,
 	})
 	if err != nil {
