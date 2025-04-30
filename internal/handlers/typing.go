@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/dwilla/mycelium/internal/pubsub"
@@ -18,14 +17,28 @@ func NewTypingHandler(ps *pubsub.PubSub) *TypingHandler {
 }
 
 func (h *TypingHandler) HandleTyping(w http.ResponseWriter, r *http.Request) {
-	var event pubsub.TypingEvent
-	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+	user, ok := GetCurrentUser(r)
+	if !ok {
+		http.Error(w, "authentication error", http.StatusInternalServerError)
 		return
 	}
 
-	// Publish the message event
-	h.pubsub.Publish(event.ChannelID, event)
+	channelID := r.URL.Query().Get("channel")
+	message := r.URL.Query().Get("message")
+
+	if channelID == "" {
+		http.Error(w, "channel id required", http.StatusBadRequest)
+		return
+	}
+
+	event := pubsub.TypingEvent{
+		UserID:   user.ID.String(),
+		Username: user.Username,
+		Channel:  channelID,
+		Message:  message,
+	}
+
+	h.pubsub.Publish(event.Channel, event)
 
 	w.WriteHeader(http.StatusOK)
 }
