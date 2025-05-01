@@ -9,6 +9,7 @@ type TypingEvent struct {
 	Username string
 	Channel  string `json:"channel"`
 	Message  string `json:"message"`
+	Sent     bool
 }
 
 type PubSub struct {

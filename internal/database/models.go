@@ -22,7 +22,7 @@ type Channel struct {
 type Message struct {
 	ID        uuid.UUID
 	Author    uuid.UUID
-	Channel   uuid.NullUUID
+	Channel   uuid.UUID
 	Body      string
 	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime

@@ -104,7 +104,7 @@ func (cfg Config) GetUserChannels(w http.ResponseWriter, r *http.Request) {
 	fragments.WriteString(`<div id="user-channels">`)
 	for i, channel := range channels {
 		fragments.WriteString(fmt.Sprintf(
-			`<button id="channel-%v" data-on-click="@get('/chat/%v')">%v</button>`,
+			`<button id="channel-%v" data-on-click="@get('/channel/%v')">%v</button>`,
 			i,
 			channel.ID,
 			channel.Name,
@@ -207,4 +207,45 @@ func (cfg Config) HandleNewSub(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (cfg Config) HandleGetChannel(w http.ResponseWriter, r *http.Request) {
+	channelID := r.PathValue("id")
+	if channelID == "" {
+		respondWithErrors(w, r, "no id in path", fmt.Errorf("no id"))
+		return
+	}
+
+	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(channelID))
+	if err != nil {
+		respondWithErrors(w, r, "error getting channel", err)
+		return
+	}
+
+	// First send a signal to close the old typing events connection
+	closeSSE := datastar.NewSSE(w, r)
+	if err := closeSSE.MergeSignals([]byte(`{"closeTypingEvents": true}`)); err != nil {
+		respondWithErrors(w, r, "error sending close signal", err)
+		return
+	}
+	closeSSE.Context().Done()
+
+	// Now update the view with the new channel
+	viewSignals := channelSignals{
+		ViewChannel: ViewChannel{
+			ID:   channel.ID.String(),
+			Name: channel.Name,
+		},
+	}
+
+	sse := datastar.NewSSE(w, r)
+	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
+		respondWithErrors(w, r, "error merging signals", err)
+		return
+	}
+
+	sse.Context().Done()
+
+	chatHandler := cfg.HandleGetChat
+	chatHandler(w, r)
 }

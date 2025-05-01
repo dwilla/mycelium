@@ -38,7 +38,7 @@ func main() {
 	cfg.DB = dbQueries
 
 	pubsub := pubsub.New()
-	typingHandler := handlers.NewTypingHandler(pubsub)
+	typingHandler := handlers.NewTypingHandler(pubsub, &cfg)
 
 	isProduction := os.Getenv("RENDER") == "true"
 	if isProduction {
@@ -78,6 +78,7 @@ func main() {
 	mux.Handle("GET /channels", cfg.Auth(http.HandlerFunc(cfg.GetUserChannels)))
 	mux.Handle("GET /channels/new", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannelComponent)))
 	mux.Handle("POST /channels", cfg.Auth(http.HandlerFunc(cfg.HandleNewChannel)))
+	mux.Handle("GET /channel/{id}", cfg.Auth(http.HandlerFunc(cfg.HandleGetChannel)))
 	mux.Handle("GET /chat/{id}", cfg.Auth(http.HandlerFunc(cfg.HandleGetChat)))
 	mux.Handle("POST /subs", cfg.Auth(http.HandlerFunc(cfg.HandleNewSub)))
 	mux.Handle("POST /typing", cfg.Auth(http.HandlerFunc(typingHandler.HandleTyping)))
