@@ -103,7 +103,7 @@ func (cfg Config) GetUserChannels(w http.ResponseWriter, r *http.Request) {
 	var fragments strings.Builder
 	fragments.WriteString(`<div id="user-channels" class="space-y-2">`)
 	for i, channel := range channels {
-		fragments.WriteString(fmt.Sprintf(
+		fragments.WriteString(fmt.Sprintf( // ------------------------------- channel buttons
 			`<button id="channel-%v" data-on-click="@get('/channel/%v')" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200">#  %v</button>`,
 			i,
 			channel.ID,
@@ -222,7 +222,7 @@ func (cfg Config) HandleGetChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// First send a signal to close the old typing events connection
+	// failed attempt find better way to close
 	closeSSE := datastar.NewSSE(w, r)
 	if err := closeSSE.MergeSignals([]byte(`{"closeTypingEvents": true}`)); err != nil {
 		respondWithErrors(w, r, "error sending close signal", err)
@@ -230,7 +230,6 @@ func (cfg Config) HandleGetChannel(w http.ResponseWriter, r *http.Request) {
 	}
 	closeSSE.Context().Done()
 
-	// Now update the view with the new channel
 	viewSignals := channelSignals{
 		ViewChannel: ViewChannel{
 			ID:   channel.ID.String(),
@@ -244,6 +243,7 @@ func (cfg Config) HandleGetChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// does nothing??
 	sse.Context().Done()
 
 	chatHandler := cfg.HandleGetChat

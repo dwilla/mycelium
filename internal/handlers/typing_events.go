@@ -36,9 +36,11 @@ func (h *TypingHandler) HandleTypingEvents(w http.ResponseWriter, r *http.Reques
 		select {
 		case event := <-events:
 			if event.Sent {
+				// reset input
 				if err := sse.MergeSignals([]byte(`{"typingEvent": ""}`)); err != nil {
 					return
 				}
+				// re-loads chat
 				if err := sse.MergeSignals(fmt.Appendf(nil, `{"lastMessage": "%v"}`, time.Now())); err != nil {
 					respondWithErrors(w, r, "error merging message fragment", err)
 					return

@@ -9,6 +9,7 @@ import (
 )
 
 func (cfg Config) HandleMain(w http.ResponseWriter, r *http.Request) {
+	// no auth middleware...get cookies manually
 	tokenCookie, _ := r.Cookie("token")
 	refreshCookie, _ := r.Cookie("refresh-token")
 	isAuthenticated := tokenCookie != nil || refreshCookie != nil
@@ -50,7 +51,6 @@ func (cfg Config) HandleHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If we have a channel, load its messages
 	if len(channels) != 0 {
 		if err := sse.MergeFragments(
 			`<ul id="messages"></ul>`,
@@ -69,7 +69,7 @@ func (cfg Config) HandleHome(w http.ResponseWriter, r *http.Request) {
 
 		for _, message := range messages {
 			if err := sse.MergeFragments(
-				fmt.Sprintf(`<li>%s:<br>%s</li>`, message.Username, message.Body),
+				fmt.Sprintf(`<li>%s:<br>%s</li>`, message.Username, message.Body), // message fragments
 				datastar.WithSelector("#messages"),
 				datastar.WithMergeMode("append"),
 			); err != nil {

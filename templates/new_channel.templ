@@ -1,14 +1,59 @@
 package templates
 
+import (
+	"github.com/axzilla/templui/component/button"
+	"github.com/axzilla/templui/component/card"
+	"github.com/axzilla/templui/component/input"
+)
+
 templ NewChannel() {
     <div id="app">
-        <div id="errors"></div>
-        <div id="new-channel" data-signals="{newChanName: '', chanExisting: false}">
-            <p>Create new channel, or join an existing one.</p>
-            <label>New channel name or existing channel id:</label>
-            <input type="text" data-bind="$newChanName" data-on-signal-change="@get('/auth/channel')"></input>
-            <button data-show="$chanExisting == false && $newChanName != ''" data-on-click="@post('/channels')">Create New Channel</button>
-            <button data-show="$chanExisting == true" data-on-click="@post('/subs')">Join Channel</button>
-        </div>
+        @card.Card(card.Props{
+            Class: "max-w-md mx-auto mt-8",
+        }) {
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-center mb-6">Create or Join Channel</h1>
+                <div id="errors" class="text-red-500 mb-4"></div>
+                <div id="new-channel" data-signals="{newChanName: '', chanExisting: false}">
+                    <p class="text-gray-600 mb-4">Create a new channel or join an existing one by entering the channel name or ID.</p>
+                    
+                    @input.Input(input.Props{
+                        Type: input.TypeText,
+                        Placeholder: "Channel name or ID",
+                        Class: "w-full mb-4",
+                        Attributes: templ.Attributes{
+                            "data-bind": "$newChanName",
+                            "data-on-signal-change": "@get('/auth/channel')",
+                        },
+                    })
+
+                    <div class="flex flex-col gap-2">
+                        @button.Button(button.Props{
+                            Size: "md",
+                            Variant: button.VariantDefault,
+                            Class: "w-full",
+                            Attributes: templ.Attributes{
+                                "data-show": "$chanExisting == false && $newChanName != ''",
+                                "data-on-click": "@post('/channels')",
+                            },
+                        }) {
+                            Create New Channel
+                        }
+
+                        @button.Button(button.Props{
+                            Size: "md",
+                            Variant: button.VariantSecondary,
+                            Class: "w-full",
+                            Attributes: templ.Attributes{
+                                "data-show": "$chanExisting == true",
+                                "data-on-click": "@post('/subs')",
+                            },
+                        }) {
+                            Join Channel
+                        }
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 }

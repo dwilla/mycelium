@@ -40,7 +40,7 @@ func (cfg Config) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 
 	for _, message := range messages {
 		if err := sse.MergeFragments(
-			fmt.Sprintf(`<li>%s:<br>%s</li>`, message.Username, message.Body),
+			fmt.Sprintf(`<li><b>%s</b>:<br>%s</li>`, message.Username, message.Body), // chat fragments
 			datastar.WithSelector("#messages"),
 			datastar.WithMergeMode("append"),
 		); err != nil {
