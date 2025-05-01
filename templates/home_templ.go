@@ -8,6 +8,12 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"github.com/axzilla/templui/component/button"
+	"github.com/axzilla/templui/component/card"
+	"github.com/axzilla/templui/component/input"
+)
+
 func Home() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +35,7 @@ func Home() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\"><div id=\"errors\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\" class=\"h-screen flex flex-col\"><div id=\"errors\" class=\"text-red-500 p-4\"></div><div class=\"flex flex-1 gap-4 p-4\" data-signals=\"{seeChannels: true}\"><div class=\"flex-1 flex flex-col relative\"><div class=\"flex-1 relative\"><div class=\"absolute left-0 top-0 h-full z-10 transition-transform duration-300\" data-show=\"$seeChannels\" data-hide=\"!$seeChannels\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -37,11 +43,15 @@ func Home() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><div class=\"h-full\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = Chat().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +80,105 @@ func Chat() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"chat\"><div data-on-load=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\" data-on-signal-change-view-channel.id=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\"><div id=\"view\" data-show=\"$viewChannel.id != &#39;&#39;\" data-signals=\"{msg: &#39;&#39;, typingEvent: &#39;&#39;, lastMessage: &#39;&#39;}\" data-on-signal-change-view-channel.id=\"@get(&#39;/chat/&#39; + $viewChannel.id)\" data-on-signal-change-last-message=\"@get(&#39;/chat/&#39; + $viewChannel.id)\"><h3 data-text=\"$viewChannel.name\"></h3><ul id=\"messages\"></ul><div id=\"typing-events\"><div id=\"type-event\" data-text=\"$typingEvent\"></div></div><input type=\"text\" data-bind=\"$msg\" data-on-input=\"@post(&#39;/typing?channel=&#39; + $viewChannel.id + &#39;&amp;message=&#39; + $msg + &#39;&amp;sent=false&#39;)\"> <button data-show=\"$msg != &#39;&#39;\" data-on-click=\"@post(&#39;/typing?channel=&#39; + $viewChannel.id + &#39;&amp;message=&#39; + $msg + &#39;&amp;sent=true&#39;)\">Send</button></div></div></div>")
+		templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"flex-1 flex flex-col\"><div data-on-load=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\" data-on-signal-change-view-channel.id=\"@get(&#39;/typing-events?channel=&#39; + $viewChannel.id)\"><div id=\"view\" data-show=\"$viewChannel.id != &#39;&#39;\" data-signals=\"{msg: &#39;&#39;, typingEvent: &#39;&#39;, lastMessage: &#39;&#39;}\" data-on-signal-change-view-channel.id=\"@get(&#39;/chat/&#39; + $viewChannel.id)\" data-on-signal-change-last-message=\"@get(&#39;/chat/&#39; + $viewChannel.id)\"><div class=\"p-4 border-b\"><div class=\"flex items-center justify-between\"><div class=\"flex items-center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"w-6 h-6 flex flex-col justify-between\"><span class=\"block w-full h-0.5 bg-current transition-transform duration-300\" data-class=\"$seeChannels ? &#39;rotate-45 translate-y-2.5&#39; : &#39;&#39;\"></span> <span class=\"block w-full h-0.5 bg-current transition-opacity duration-300\" data-class=\"$seeChannels ? &#39;opacity-0&#39; : &#39;&#39;\"></span> <span class=\"block w-full h-0.5 bg-current transition-transform duration-300\" data-class=\"$seeChannels ? &#39;-rotate-45 -translate-y-2.5&#39; : &#39;&#39;\"></span></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "sm",
+				Variant: button.VariantGhost,
+				Class:   "p-2",
+				Attributes: templ.Attributes{
+					"data-on-click": "$seeChannels = !$seeChannels",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><h3 class=\"text-xl font-semibold\" data-text=\"$viewChannel.name\"></h3></div></div><div class=\"flex-1 overflow-y-auto p-4\"><ul id=\"messages\" class=\"space-y-4\"></ul></div><div class=\"p-4 border-t\"><div id=\"typing-events\" class=\"mb-2\"><div id=\"type-event\" class=\"text-sm text-gray-500\" data-text=\"$typingEvent\"></div></div><div class=\"flex gap-2\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = input.Input(input.Props{
+				Type:        input.TypeText,
+				Placeholder: "Type a message...",
+				Class:       "flex-1",
+				Attributes: templ.Attributes{
+					"data-bind":     "$msg",
+					"data-on-input": "@post('/typing?channel=' + $viewChannel.id + '&message=' + $msg + '&sent=false')",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var5 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "Send")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "md",
+				Variant: button.VariantDefault,
+				Attributes: templ.Attributes{
+					"data-show":     "$msg != ''",
+					"data-on-click": "@post('/typing?channel=' + $viewChannel.id + '&message=' + $msg + '&sent=true')",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div></div></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = card.Card(card.Props{
+			Class: "flex-1 flex flex-col",
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -94,12 +202,65 @@ func Channels() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div id=\"channels\"><div id=\"user-channels\" data-on-load=\"@get(&#39;/channels&#39;)\"></div><div><button data-on-click=\"@get(&#39;/channels/new&#39;)\">Add or Join Channel</button></div></div>")
+		templ_7745c5c3_Var7 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"p-4 border-b\"><h2 class=\"text-lg font-semibold\">Channels</h2></div><div class=\"flex-1 overflow-y-auto p-4\"><div id=\"user-channels\" data-on-load=\"@get(&#39;/channels&#39;)\"></div></div><div class=\"p-4 border-t\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var8 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "Add or Join Channel")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "md",
+				Variant: button.VariantDefault,
+				Class:   "w-full",
+				Attributes: templ.Attributes{
+					"data-on-click": "@get('/channels/new')",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = card.Card(card.Props{
+			Class: "w-80 flex flex-col",
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -101,10 +101,10 @@ func (cfg Config) GetUserChannels(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
 	var fragments strings.Builder
-	fragments.WriteString(`<div id="user-channels">`)
+	fragments.WriteString(`<div id="user-channels" class="space-y-2">`)
 	for i, channel := range channels {
 		fragments.WriteString(fmt.Sprintf(
-			`<button id="channel-%v" data-on-click="@get('/channel/%v')">%v</button>`,
+			`<button id="channel-%v" data-on-click="@get('/channel/%v')" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200">#  %v</button>`,
 			i,
 			channel.ID,
 			channel.Name,

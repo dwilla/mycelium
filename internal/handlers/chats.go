@@ -49,7 +49,7 @@ func (cfg Config) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := sse.MergeSignals([]byte(`{"typingEvent": "", "msg": ""}`)); err != nil {
+	if err := sse.MergeSignals([]byte(`{"typingEvent": "", "msg": "", "seeChannels": false}`)); err != nil {
 		respondWithErrors(w, r, "error clearing signals", err)
 		return
 	}

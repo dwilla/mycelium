@@ -1,11 +1,15 @@
 package templates
 
+import (
+	"github.com/axzilla/templui/component/button"
+)
+
 templ Main(loadApp bool, isAuthenticated bool) {
     <!DOCTYPE html>
     <html>
         <head>
             <title>Mycelium</title>
-            <link rel="stylesheet" href="/static/styles.css">
+            <link rel="stylesheet" href="/assets/css/output.css">
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <meta name="csrf-token" content="{ csrfToken }">
@@ -31,26 +35,51 @@ templ Main(loadApp bool, isAuthenticated bool) {
             </script>
         </head>
         <body>
-            <div data-signals="{auth: false}">
-                <header>
-                    <nav>
-                        <button>Account</button>
-                        if isAuthenticated {
-                            <a href="/auth/logout">Sign Out</a>
-                        }
-                    </nav>
-                </header>
-                if loadApp {
-                    <div id="app" data-on-load="@get('/app')" data-on-datastar-sse="console.log('SSE Event:', evt.detail.type)">
-                    </div>
-                } else {
-                    <div id="app">
-                    </div>
-                }
+            <div class="max-w-md mx-auto px-4">
+                <div data-signals="{auth: false}">
+                    <header>
+                        <nav class="border-b py-3">
+                            <div class="container mx-auto px-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="assets/images/Logo@0.5x.png" alt="Mycelium Logo" class="h-12 w-auto object-contain">
+                                </div>
+                                <div class="flex items-center">
+                                    @button.Button(button.Props{
+                                        Size:    "md",
+                                        Variant: button.VariantDefault,
+                                        Class:   "mr-2",
+                                    }) {
+                                        Home
+                                    }
+                                    if isAuthenticated {
+                                        @button.Button(button.Props{
+                                            Href: "/auth/logout",
+                                            Variant: button.VariantDefault,
+                                            Size: "md",
+                                        }) {
+                                            Sign Out
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+                    if loadApp {
+                        <div id="app-container">
+                            <div id="app" data-on-load="@get('/app')" data-on-datastar-sse="console.log('SSE Event:', evt.detail.type)">
+                            </div>
+                        </div>
+                    } else {
+                        <div id="app-container">
+                            <div id="app">
+                            </div>
+                        </div>
+                    }
+                </div>
+                <footer>
+                    <!-- Add your footer here -->
+                </footer>
             </div>
-            <footer>
-                <!-- Add your footer here -->
-            </footer>
         </body>
     </html>
 }
