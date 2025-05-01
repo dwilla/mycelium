@@ -8,6 +8,12 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"github.com/axzilla/templui/component/button"
+	"github.com/axzilla/templui/component/card"
+	"github.com/axzilla/templui/component/input"
+)
+
 func Login() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +35,192 @@ func Login() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\"><h1>Welcome to Mycelium</h1><div id=\"errors\"></div><div id=\"msg\"></div><div id=\"user\" data-signals=\"{email: &#39;&#39;, username: &#39;&#39;, password: &#39;&#39;, exists: false, valid: false, &#39;user-valid&#39;: false, &#39;pass-valid&#39;: false}\"><div><p data-show=\"$valid == false\">Enter Valid Email</p><p data-show=\"$valid == true &amp;&amp; $exists == false\">Create an account:</p><p data-show=\"$valid == true &amp;&amp; $exists == true\">Welcome Back!</p><input type=\"text\" data-bind=\"email\"></div><br><div data-on-signal-change-email=\"@get(&#39;/auth/email&#39;)\" data-indicator-fetching><div data-show=\"$valid == true &amp;&amp; $exists == false\" data-on-signal-change-password=\"@get(&#39;/auth/password&#39;)\" data-on-signal-change-username=\"@get(&#39;/auth/username&#39;)\"><label>Pick a username:</label> <input type=\"text\" data-bind=\"username\"><p data-show=\"$user-valid == false\">Username invalid or not available.</p><p data-show=\"$user-valid == true\">Username available!</p><label>Password:</label> <input type=\"password\" data-bind=\"password\"><p data-show=\"$pass-valid == false\">Invalid password. Must be 12 characters long.</p><p data-show=\"$pass-valid == true &amp;&amp; $user-valid == false\">Perfect!</p><br><button data-show=\"$user-valid == true &amp;&amp; $pass-valid == true\" data-on-click=\"@post(&#39;/auth/newuser&#39;)\">Sign Up</button></div><div data-show=\"$valid == true &amp;&amp; $exists == true\" data-on-signal-change-password=\"@get(&#39;/auth/password&#39;)\"><label>Password:</label> <input type=\"password\" data-bind=\"password\"><br><button data-show=\"$pass-valid == true\" data-on-click=\"@post(&#39;/auth/login&#39;)\">Sign In</button> <button data-on-click=\"@post(&#39;/email/reset&#39;)\">Forgot Password</button></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"app\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"p-6\"><h1 class=\"text-2xl font-bold text-center mb-6\">Welcome to Mycelium</h1><div id=\"errors\" class=\"text-red-500 mb-4\"></div><div id=\"msg\" class=\"text-green-500 mb-4\"></div><div id=\"user\" data-signals=\"{email: &#39;&#39;, username: &#39;&#39;, password: &#39;&#39;, exists: false, valid: false, &#39;user-valid&#39;: false, &#39;pass-valid&#39;: false}\"><div class=\"space-y-4\"><p class=\"text-red-500\" data-show=\"$valid == false\">Enter Valid Email</p><p class=\"text-green-500\" data-show=\"$valid == true &amp;&amp; $exists == false\">Create an account:</p><p class=\"text-green-500\" data-show=\"$valid == true &amp;&amp; $exists == true\">Welcome Back!</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = input.Input(input.Props{
+				Type:        input.TypeEmail,
+				Placeholder: "Email",
+				Class:       "w-full",
+				Attributes: templ.Attributes{
+					"data-bind": "email",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"mt-6\" data-on-signal-change-email=\"@get(&#39;/auth/email&#39;)\" data-indicator-fetching><div class=\"space-y-4\" data-show=\"$valid == true &amp;&amp; $exists == false\" data-on-signal-change-password=\"@get(&#39;/auth/password&#39;)\" data-on-signal-change-username=\"@get(&#39;/auth/username&#39;)\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = input.Input(input.Props{
+				Type:        input.TypeText,
+				Placeholder: "Username",
+				Class:       "w-full",
+				Attributes: templ.Attributes{
+					"data-bind": "username",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<p class=\"text-red-500\" data-show=\"$user-valid == false\">Username invalid or not available.</p><p class=\"text-green-500\" data-show=\"$user-valid == true\">Username available!</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = input.Input(input.Props{
+				Type:        input.TypePassword,
+				Placeholder: "Password",
+				Class:       "w-full",
+				Attributes: templ.Attributes{
+					"data-bind": "password",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<p class=\"text-red-500\" data-show=\"$pass-valid == false\">Invalid password. Must be 12 characters long.</p><p class=\"text-green-500\" data-show=\"$pass-valid == true &amp;&amp; $user-valid == false\">Perfect!</p><div class=\"flex justify-center mt-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "Sign Up")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "md",
+				Variant: button.VariantDefault,
+				Class:   "w-full",
+				Attributes: templ.Attributes{
+					"data-show":     "$user-valid == true && $pass-valid == true",
+					"data-on-click": "@post('/auth/newuser')",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div><div class=\"space-y-4\" data-show=\"$valid == true &amp;&amp; $exists == true\" data-on-signal-change-password=\"@get(&#39;/auth/password&#39;)\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = input.Input(input.Props{
+				Type:        input.TypePassword,
+				Placeholder: "Password",
+				Class:       "w-full",
+				Attributes: templ.Attributes{
+					"data-bind": "password",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex flex-col gap-2 mt-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "Sign In")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "md",
+				Variant: button.VariantDefault,
+				Class:   "w-full",
+				Attributes: templ.Attributes{
+					"data-show":     "$pass-valid == true",
+					"data-on-click": "@post('/auth/login')",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var5 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "Forgot Password")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = button.Button(button.Props{
+				Size:    "md",
+				Variant: button.VariantSecondary,
+				Class:   "w-full",
+				Attributes: templ.Attributes{
+					"data-on-click": "@post('/email/reset')",
+				},
+			}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = card.Card(card.Props{
+			Class: "max-w-md mx-auto mt-8",
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
