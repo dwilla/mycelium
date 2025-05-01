@@ -3,7 +3,6 @@ package templates
 
 templ Home() {
     <div id="app">
-        <h1>Welcome Home!</h1>
         <div id="errors"></div>
         @Channels()
         @Chat()
@@ -12,14 +11,18 @@ templ Home() {
 
 templ Chat() {
     <div id="chat">
-        <div id="view" data-show="$viewChannel.id != ''" data-signals="{msg: '', typingEvent: ''}">
-            <h2>Viewing:</h2>
+        <div data-on-load="@get('/typing-events?channel=' + $viewChannel.id)" data-on-signal-change-view-channel.id="@get('/typing-events?channel=' + $viewChannel.id)">
+        <div id="view" data-show="$viewChannel.id != ''" data-signals="{msg: '', typingEvent: '', lastMessage: ''}" data-on-signal-change-view-channel.id="@get('/chat/' + $viewChannel.id)" data-on-signal-change-last-message="@get('/chat/' + $viewChannel.id)">
             <h3 data-text="$viewChannel.name"></h3>
-            <div id="typing-events" data-on-load="@get('/typing-events?channel=' + $viewChannel.id)">
+            <ul id="messages">
+            </ul>
+            <div id="typing-events">
                 <div id="type-event" data-text="$typingEvent"></div>
             </div>
-            <input type="text" data-bind="$msg" data-on-input="@post('/typing?channel=' + $viewChannel.id + '&message=' + $msg)"></input>
-            <button data-show="$msg != ''" data-on-click="@post('/message')">Send</button>
+            <input type="text" data-bind="$msg" data-on-input="@post('/typing?channel=' + $viewChannel.id + '&message=' + $msg + '&sent=false')"></input>
+            <button data-show="$msg != ''"
+                    data-on-click="@post('/typing?channel=' + $viewChannel.id + '&message=' + $msg + '&sent=true')">Send</button>
+        </div>
         </div>
     </div>
 }

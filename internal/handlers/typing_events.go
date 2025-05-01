@@ -25,13 +25,32 @@ func (h *TypingHandler) HandleTypingEvents(w http.ResponseWriter, r *http.Reques
 	defer h.pubsub.Unsubscribe(channelID, events)
 
 	sse := datastar.NewSSE(w, r)
+
 	clientGone := r.Context().Done()
+
+	if err := sse.MergeSignals([]byte(`{"typingEvent": ""}`)); err != nil {
+		return
+	}
 
 	for {
 		select {
 		case event := <-events:
-			if err := sse.MergeSignals(fmt.Appendf(nil, `{"typingEvent": "%s: %s"}`, event.Username, event.Message)); err != nil {
-				return
+			if event.Sent {
+				if err := sse.MergeSignals([]byte(`{"typingEvent": ""}`)); err != nil {
+					return
+				}
+				if err := sse.MergeSignals(fmt.Appendf(nil, `{"lastMessage": "%v"}`, time.Now())); err != nil {
+					respondWithErrors(w, r, "error merging message fragment", err)
+					return
+				}
+			} else if event.Message == "" {
+				if err := sse.MergeSignals([]byte(`{"typingEvent": ""}`)); err != nil {
+					return
+				}
+			} else {
+				if err := sse.MergeSignals(fmt.Appendf(nil, `{"typingEvent": "%s: %s"}`, event.Username, event.Message)); err != nil {
+					return
+				}
 			}
 		case <-clientGone:
 			return

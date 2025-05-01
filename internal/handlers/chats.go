@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dwilla/mycelium/templates"
 	"github.com/google/uuid"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
@@ -16,28 +15,44 @@ func (cfg Config) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(channelID)) //use this channel
+	channel, err := cfg.DB.GetChannelByID(r.Context(), uuid.MustParse(channelID))
 	if err != nil {
 		respondWithErrors(w, r, "error getting channel", err)
 		return
 	}
 
-	viewSignals := channelSignals{
-		ViewChannel: ViewChannel{
-			ID:   channel.ID.String(),
-			Name: channel.Name,
-		},
+	messages, err := cfg.DB.GetMessagesForChannel(r.Context(), channel.ID)
+	if err != nil {
+		respondWithErrors(w, r, "error getting messages", err)
+		return
 	}
-
-	component := templates.Chat()
 
 	sse := datastar.NewSSE(w, r)
-	if err := sse.MarshalAndMergeSignals(viewSignals); err != nil {
-		respondWithErrors(w, r, "error merging signals", err)
+
+	if err := sse.MergeFragments(
+		`<ul id="messages"></ul>`,
+		datastar.WithSelector("#messages"),
+		datastar.WithMergeMode("outer"),
+	); err != nil {
+		respondWithErrors(w, r, "error clearing messages", err)
 		return
 	}
-	if err := sse.MergeFragmentTempl(component); err != nil {
-		respondWithErrors(w, r, "error merging component", err)
+
+	for _, message := range messages {
+		if err := sse.MergeFragments(
+			fmt.Sprintf(`<li>%s:<br>%s</li>`, message.Username, message.Body),
+			datastar.WithSelector("#messages"),
+			datastar.WithMergeMode("append"),
+		); err != nil {
+			respondWithErrors(w, r, "error merging message fragment", err)
+			return
+		}
+	}
+
+	if err := sse.MergeSignals([]byte(`{"typingEvent": "", "msg": ""}`)); err != nil {
+		respondWithErrors(w, r, "error clearing signals", err)
 		return
 	}
+
+	sse.Context().Done()
 }

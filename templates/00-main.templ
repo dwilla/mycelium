@@ -41,7 +41,7 @@ templ Main(loadApp bool, isAuthenticated bool) {
                     </nav>
                 </header>
                 if loadApp {
-                    <div id="app" data-on-load="@get('/app')">
+                    <div id="app" data-on-load="@get('/app')" data-on-datastar-sse="console.log('SSE Event:', evt.detail.type)">
                     </div>
                 } else {
                     <div id="app">

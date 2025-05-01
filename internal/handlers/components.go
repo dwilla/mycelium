@@ -49,4 +49,33 @@ func (cfg Config) HandleHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	// If we have a channel, load its messages
+	if len(channels) != 0 {
+		if err := sse.MergeFragments(
+			`<ul id="messages"></ul>`,
+			datastar.WithSelector("#messages"),
+			datastar.WithMergeMode("outer"),
+		); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		messages, err := cfg.DB.GetMessagesForChannel(r.Context(), channels[0].ID)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		for _, message := range messages {
+			if err := sse.MergeFragments(
+				fmt.Sprintf(`<li>%s:<br>%s</li>`, message.Username, message.Body),
+				datastar.WithSelector("#messages"),
+				datastar.WithMergeMode("append"),
+			); err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+		}
+	}
 }

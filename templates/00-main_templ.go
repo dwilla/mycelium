@@ -44,7 +44,7 @@ func Main(loadApp bool, isAuthenticated bool) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if loadApp {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div id=\"app\" data-on-load=\"@get(&#39;/app&#39;)\" data-on-datastar-sse=\"console.log(&#39;SSE Event:&#39;, evt.detail.type)\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
