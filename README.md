@@ -12,5 +12,6 @@ Play with the platform in production:
 - Templ
 - Datastar
 - Templ UI
+- Tailwind
 - Postgres
 - Love 💜
